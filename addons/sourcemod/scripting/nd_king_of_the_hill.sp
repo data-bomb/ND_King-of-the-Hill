@@ -308,7 +308,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.1"
+#define PLUGIN_VERSION "1.0.2"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -521,12 +521,6 @@ public void OnPluginStart()
     HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
     HookEvent("player_changeclass", Event_PlayerClass, EventHookMode_Post);
     HookEvent("round_win", Event_RoundWin, EventHookMode_Post);
-    HookEvent("timeleft_10m", Event_Timeleft, EventHookMode_Pre);
-    HookEvent("timeleft_5m", Event_Timeleft, EventHookMode_Pre);
-    HookEvent("timeleft_1m", Event_Timeleft, EventHookMode_Pre);
-    HookEvent("timeleft_30s", Event_Timeleft, EventHookMode_Pre);
-    HookEvent("timeleft_10s", Event_Timeleft, EventHookMode_Pre);
-    HookEvent("timeleft_5s", Event_Timeleft, EventHookMode_Pre);
 
     if (g_bLateLoad)
     {
@@ -654,12 +648,6 @@ public Action Event_ResourceCaptured(Event event, const char[] sName, bool bDont
     }
 
     return Plugin_Continue;
-}
-
-public Action Event_Timeleft(Event event, const char[] sName, bool bDontBroadcast)
-{
-    PrintToChatAll("Found %s event", sName);
-    return Plugin_Handled;
 }
 
 public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcast)
