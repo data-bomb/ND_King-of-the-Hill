@@ -1,4 +1,4 @@
-# ND_King-of-the-Hill
+# [ND] King of the Hill
 
 A SourceMod gamemode plugin for Nuclear Dawn.
 
