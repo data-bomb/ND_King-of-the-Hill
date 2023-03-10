@@ -308,7 +308,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.2"
+#define PLUGIN_VERSION "1.0.3"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -677,6 +677,10 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
     // calculate time needed (in seconds) to clinch victory
     int iClinchTime = (60 * g_cRoundTime.IntValue)/2 + 1;
 
+    #if defined DEBUG
+    PrintToServer("Clinch time set to %d seconds.", iClinchTime);
+    #endif
+
     ND_FindMapEntities();
 
     // keep track of the score
@@ -970,8 +974,8 @@ public Action Timer_IssueDebit(Handle hTimer, DataPack hReceiveData)
 
 public Action Timer_SetResources(Handle hTimer)
 {
-    int iEmpireStartingResources = TRANSPORT_GATE_COST + RELAY_TOWER_COST + 100;
-    int iConsortiumStartingResources = TRANSPORT_GATE_COST + WIRELESS_REPEATER_COST + 100;
+    int iEmpireStartingResources = 2*TRANSPORT_GATE_COST + 2*RELAY_TOWER_COST + 1000;
+    int iConsortiumStartingResources = 2*TRANSPORT_GATE_COST + 2*WIRELESS_REPEATER_COST + 1000;
 
     SetEntProp(g_iTeamEntity[TEAM_EMPIRE-2], Prop_Send, "m_iResourcePoints", iEmpireStartingResources);
     SetEntProp(g_iTeamEntity[TEAM_CONSORT-2], Prop_Send, "m_iResourcePoints", iConsortiumStartingResources);
