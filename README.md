@@ -1,5 +1,7 @@
 # ND_King-of-the-Hill
 
+A SourceMod gamemode plugin for Nuclear Dawn.
+
 ## Description:
 Teams fight over control of the Primary Resource Point in timed round matches.
 The team who controls Prime for the longest amount of time will win the round.
