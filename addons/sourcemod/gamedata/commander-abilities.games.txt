@@ -8,21 +8,25 @@
             {
                 "library"   "server"
                 "linux"     "@_ZN16CNDBaseArtillery14FireAtPositionERK6VectorP9CNDPlayerb"
+                "windows"   "\x53\x8B\xDC\x83\xEC\x08\x83\xE4\xF0\x83\xC4\x04\x55\x8B\x6B\x2A\x89\x6C\x24\x2A\x8B\xEC\x81\xEC\x58\x01\x00\x00\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\x2A\xF3\x0F\x10\x05"
             }
             "CNDCommanderDamageAbility::RunAbility"
             {
                 "library"   "server"
                 "linux"     "@_ZN25CNDCommanderDamageAbility10RunAbilityEP9CNDPlayerRK6Vector"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x60\x0F\x57\xC0"
             }
             "CNDCommanderHealAbility::RunAbility"
             {
                 "library"   "server"
                 "linux"     "@_ZN23CNDCommanderHealAbility10RunAbilityEP9CNDPlayerRK6Vector"
+                "windows"   "\x55\x8B\xEC\x81\xEC\x88\x00\x00\x00\x53\x56\x8B\xF1\x57"
             }
             "CNDCommanderHinderAbility::RunAbility"
             {
                 "library"   "server"
                 "linux"     "@_ZN25CNDCommanderHinderAbility10RunAbilityEP9CNDPlayerRK6Vector"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x08\x53\x56\x8B\xF1\x0F\x57\xC0"
             }
         }
         "Functions"
