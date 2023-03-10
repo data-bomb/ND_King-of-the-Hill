@@ -308,7 +308,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.4"
+#define PLUGIN_VERSION "1.0.5"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -989,6 +989,7 @@ public Action Timer_SetResources(Handle hTimer)
 public Action Timer_TerminateRound(Handle hTimer)
 {
     KingOfTheHill_EndRound();
+    g_hTimer_TerminateRound = INVALID_HANDLE;
     return Plugin_Stop;
 }
 
