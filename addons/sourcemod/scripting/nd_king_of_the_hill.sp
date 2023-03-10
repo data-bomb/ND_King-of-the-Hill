@@ -308,7 +308,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.5"
+#define PLUGIN_VERSION "1.0.6"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -950,9 +950,9 @@ public Action MessageHook_RecieveResources(UserMsg hMessageId, BfRead hBitBuffer
 {
     int iTeam = BfReadShort(hBitBuffer);
     int iResources = BfReadShort(hBitBuffer);
-    int eType = BfReadShort(hBitBuffer);
+    eNDResourceTransactionType eType = view_as<eNDResourceTransactionType>(BfReadShort(hBitBuffer));
 
-    if (eType == 4 && (iTeam == TEAM_EMPIRE || iTeam == TEAM_CONSORT))
+    if (eType == eNDTransaction_Extraction && (iTeam == TEAM_EMPIRE || iTeam == TEAM_CONSORT))
     {
         DataPack hReceiveData = new DataPack();
         hReceiveData.WriteCell(iTeam);
