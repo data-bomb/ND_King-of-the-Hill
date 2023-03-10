@@ -298,15 +298,17 @@ enum eNDRoundEndReason
 
 #define MAYCAPTURE_PARAM_TEAM               1
 #define MAYCAPTURE_PARAM_RESOURCE_POINT     2
+
 #define COMMANDER_ABILITY_PARAM_CNDPLAYER   1
 #define COMMANDER_ABILITY_PARAM_POSITION    2
+
 #define FIRE_ARTILLERY_PARAM_POSITION       1
 #define FIRE_ARTILLERY_PARAM_CNDPLAYER      2
 
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.0"
+#define PLUGIN_VERSION "1.0.1"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -440,12 +442,17 @@ public void OnPluginStart()
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
     g_hSDKCall_ReceiveResources = EndPrepSDKCall();
 
+    if (!g_hSDKCall_ReceiveResources)
+    {
+        SetFailState("Failed to establish SDKCall for CNuclearDawn::ReceiveResources");
+    }
+
     // prep a call to take resources away
     StartPrepSDKCall(SDKCall_GameRules);
     bSuccess = PrepSDKCall_SetFromConf(hGameDataResource, SDKConf_Signature, "CNuclearDawn::SpendResources");
     if (!bSuccess)
     {
-        SetFailState("Failed to find signature CNuclearDawn::ReceiveResources");
+        SetFailState("Failed to find signature CNuclearDawn::SpendResources");
     }
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
