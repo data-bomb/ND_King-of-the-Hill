@@ -1,0 +1,83 @@
+"Games"
+{
+    "nucleardawn"
+    {
+        "Signatures"
+        {
+            "CNDPlayerBot::SelectResourcePointToDefend"
+            {
+                "library"   "server"
+                "linux"     "@_ZNK12CNDPlayerBot27SelectResourcePointToDefendEP10CUtlVectorIP20CNDBaseResourcePoint10CUtlMemoryIS2_iEE"
+            }
+            "CNDPlayerBot::SelectResourcePointToCapture"
+            {
+                "library"   "server"
+                "linux"     "@_ZN12CNDPlayerBot28SelectResourcePointToCaptureEP10CUtlVectorIP20CNDBaseResourcePoint10CUtlMemoryIS2_iEE"
+            }
+            "CNuclearDawn::ReceiveResources"
+            {
+                "library"   "server"
+                "linux"     "@_ZN12CNuclearDawn16ReceiveResourcesEii24eResourceTransactionType"
+            }
+            "CNuclearDawn::SpendResources"
+            {
+                "library"   "server"
+                "linux"     "@_ZN12CNuclearDawn14SpendResourcesEii24eResourceTransactionType"
+            }
+            "CNuclearDawn::TeamMayCapturePoint"
+            {
+                "library"   "server"
+                "linux"     "@_ZN12CNuclearDawn19TeamMayCapturePointEiP20CNDBaseResourcePoint"
+            }
+        }
+        "Functions"
+        {
+            "CNDPlayerBot::SelectResourcePointToCapture"
+            {
+                "signature" "CNDPlayerBot::SelectResourcePointToCapture"
+                "callconv"  "thiscall"
+                "return"    "cbaseentity"
+                "this"      "ignore"
+                "arguments"
+                {
+                    "position"
+                    {
+                        "type"  "vectorptr"
+                    }
+                }
+            }
+            "CNDPlayerBot::SelectResourcePointToDefend"
+            {
+                "signature" "CNDPlayerBot::SelectResourcePointToDefend"
+                "callconv"  "thiscall"
+                "return"    "cbaseentity"
+                "this"      "ignore"
+                "arguments"
+                {
+                    "position"
+                    {
+                        "type"  "vectorptr"
+                    }
+                }
+            }
+            "CNuclearDawn::TeamMayCapturePoint"
+            {
+                "signature" "CNuclearDawn::TeamMayCapturePoint"
+                "callconv"  "thiscall"
+                "return"    "bool"
+                "this"      "ignore"
+                "arguments"
+                {
+                    "team"
+                    {
+                        "type"  "int"
+                    }
+                    "resourcepoint"
+                    {
+                        "type"  "objectptr"
+                    }
+                }
+            }
+        }
+    }
+}

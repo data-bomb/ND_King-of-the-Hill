@@ -1,0 +1,14 @@
+"Games"
+{
+    "nucleardawn"
+    {
+        "Signatures"
+        {
+            "CNuclearDawn::SetRoundWin"
+            {
+                "library"   "server"
+                "linux"     "@_ZN12CNuclearDawn11SetRoundWinEi14eGameWinReason"
+            }
+        }
+    }
+}

@@ -1,0 +1,108 @@
+"Games"
+{
+    "nucleardawn"
+    {
+        "Signatures"
+        {
+            "CNDBaseArtillery::FireAtPosition"
+            {
+                "library"   "server"
+                "linux"     "@_ZN16CNDBaseArtillery14FireAtPositionERK6VectorP9CNDPlayerb"
+            }
+            "CNDCommanderDamageAbility::RunAbility"
+            {
+                "library"   "server"
+                "linux"     "@_ZN25CNDCommanderDamageAbility10RunAbilityEP9CNDPlayerRK6Vector"
+            }
+            "CNDCommanderHealAbility::RunAbility"
+            {
+                "library"   "server"
+                "linux"     "@_ZN23CNDCommanderHealAbility10RunAbilityEP9CNDPlayerRK6Vector"
+            }
+            "CNDCommanderHinderAbility::RunAbility"
+            {
+                "library"   "server"
+                "linux"     "@_ZN25CNDCommanderHinderAbility10RunAbilityEP9CNDPlayerRK6Vector"
+            }
+        }
+        "Functions"
+        {
+            "CNDBaseArtillery::FireAtPosition"
+            {
+                "signature" "CNDBaseArtillery::FireAtPosition"
+                "callconv"  "thiscall"
+                "return"    "void"
+                "this"      "ignore"
+                "arguments"
+                {
+                    "position"
+                    {
+                        "type"  "vectorptr"
+                    }
+                    "player"
+                    {
+                        "type"  "objectptr"
+                    }
+                    "ready"
+                    {
+                        "type"  "bool"
+                    }
+                }
+            }
+            "CNDCommanderDamageAbility::RunAbility"
+            {
+                "signature" "CNDCommanderDamageAbility::RunAbility"
+                "callconv"  "thiscall"
+                "return"    "void"
+                "this"      "ignore"
+                "arguments"
+                {
+                    "player"
+                    {
+                        "type"  "objectptr"
+                    }
+                    "position"
+                    {
+                        "type"  "vectorptr"
+                    }
+                }
+            }
+            "CNDCommanderHealAbility::RunAbility"
+            {
+                "signature" "CNDCommanderHealAbility::RunAbility"
+                "callconv"  "thiscall"
+                "return"    "void"
+                "this"      "ignore"
+                "arguments"
+                {
+                    "player"
+                    {
+                        "type"  "objectptr"
+                    }
+                    "position"
+                    {
+                        "type"  "vectorptr"
+                    }
+                }
+            }
+            "CNDCommanderHinderAbility::RunAbility"
+            {
+                "signature" "CNDCommanderHinderAbility::RunAbility"
+                "callconv"  "thiscall"
+                "return"    "void"
+                "this"      "ignore"
+                "arguments"
+                {
+                    "player"
+                    {
+                        "type"  "objectptr"
+                    }
+                    "position"
+                    {
+                        "type"  "vectorptr"
+                    }
+                }
+            }
+        }
+    }
+}
