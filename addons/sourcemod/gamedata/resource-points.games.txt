@@ -8,26 +8,31 @@
             {
                 "library"   "server"
                 "linux"     "@_ZNK12CNDPlayerBot27SelectResourcePointToDefendEP10CUtlVectorIP20CNDBaseResourcePoint10CUtlMemoryIS2_iEE"
+                "windows"   "\x55\x8B\xEC\xA1\x2A\x2A\x2A\x2A\x56\x80\xB8\x86\x04\x00\x00\x00"
             }
             "CNDPlayerBot::SelectResourcePointToCapture"
             {
                 "library"   "server"
                 "linux"     "@_ZN12CNDPlayerBot28SelectResourcePointToCaptureEP10CUtlVectorIP20CNDBaseResourcePoint10CUtlMemoryIS2_iEE"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x0C\x53\x57\x8B\x7D\x2A\x8B\xD9\x89\x5D"
             }
             "CNuclearDawn::ReceiveResources"
             {
                 "library"   "server"
                 "linux"     "@_ZN12CNuclearDawn16ReceiveResourcesEii24eResourceTransactionType"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x20\x57\x8B\x7D\x2A\x8D\x47\xFE"
             }
             "CNuclearDawn::SpendResources"
             {
                 "library"   "server"
                 "linux"     "@_ZN12CNuclearDawn14SpendResourcesEii24eResourceTransactionType"
+                "windows"   "\x55\x8B\xEC\xA1\x2A\x2A\x2A\x2A\x83\xEC\x20\x83\x78\x30\x00\x74"
             }
             "CNuclearDawn::TeamMayCapturePoint"
             {
                 "library"   "server"
                 "linux"     "@_ZN12CNuclearDawn19TeamMayCapturePointEiP20CNDBaseResourcePoint"
+                "windows"   "\x55\x8B\xEC\x56\x8B\x75\x2A\x8D\x46\xFE"
             }
         }
         "Functions"
