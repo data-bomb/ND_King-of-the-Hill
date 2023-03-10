@@ -308,7 +308,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.3"
+#define PLUGIN_VERSION "1.0.4"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -321,6 +321,7 @@ Handle g_hSDKCall_ReceiveResources = INVALID_HANDLE;
 Handle g_hSDKCall_SpendResources = INVALID_HANDLE;
 Handle g_hSDKCall_SetRoundWinner = INVALID_HANDLE;
 Handle g_hSDKCall_GetEntity = INVALID_HANDLE;
+Handle g_hTimer_TerminateRound = INVALID_HANDLE;
 float g_fPrimaryPointPosition[3] = {-1.0, -1.0, -1.0};
 float g_fBunkerEmpirePosition[3] = {-1.0, -1.0, -1.0};
 float g_fBunkerConsortPosition[3] = {-1.0, -1.0, -1.0};
@@ -652,9 +653,6 @@ public Action Event_ResourceCaptured(Event event, const char[] sName, bool bDont
 
 public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcast)
 {
-    //int iTeam = event.GetInt("team");
-    //int iType = event.GetInt("type");
-
     g_bGameStarted = false;
     g_iKingOfTheHillTeam = 0;
 
@@ -672,8 +670,13 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
     // change default starting resources
     CreateTimer(5.0, Timer_SetResources);
 
+    if (g_hTimer_TerminateRound != INVALID_HANDLE)
+    {
+        CloseHandle(g_hTimer_TerminateRound);
+    }
+
     // determine when to end the round
-    CreateTimer(60.0*float(g_cRoundTime.IntValue)-1.0, Timer_TerminateRound, _, TIMER_FLAG_NO_MAPCHANGE);
+    g_hTimer_TerminateRound = CreateTimer(60.0*float(g_cRoundTime.IntValue)-1.0, Timer_TerminateRound, _, TIMER_FLAG_NO_MAPCHANGE);
     // calculate time needed (in seconds) to clinch victory
     int iClinchTime = (60 * g_cRoundTime.IntValue)/2 + 1;
 
