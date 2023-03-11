@@ -13,8 +13,8 @@ The team who controls Prime for the longest amount of time will win the round.
 - Copy the `commander-abilities.games.txt` file to the addons/sourcemod/gamedata/ directory
 - Copy the `resource-points.games.txt` file to the addons/sourcemod/gamedata/ directory
 - Copy the `terminate-round.games.txt` file to the addons/sourcemod/gamedata/ directory
-- (Optional) `mp_roundtime 15`
-- (Optional) `mp_maxrounds 4`
+- (Optional) Add `mp_roundtime 15` to the cfg/server.cfg file
+- (Optional) Add `mp_maxrounds 4` to the cfg/server.cfg file
 
 ## Gameplay Features:
 - Turns off all tertiary and secondary resource resource points
