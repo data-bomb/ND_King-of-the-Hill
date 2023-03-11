@@ -309,7 +309,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.8"
+#define PLUGIN_VERSION "1.0.9"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -773,7 +773,7 @@ public Action Structure_Damage_Attenuation(int victim, int& attacker, int& infli
 {
     if ((victim != attacker) && (victim > 0) && (attacker > 0) && (attacker <= MaxClients))
     {
-        damage = damage * 0.42;
+        damage = damage * 0.86;
         return Plugin_Changed;
     }
 
