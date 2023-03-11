@@ -6,6 +6,10 @@ A SourceMod gamemode plugin for Nuclear Dawn.
 Teams fight over control of the Primary Resource Point in timed round matches.
 The team who controls Prime for the longest amount of time will win the round.
 
+## Installation:
+- (Optional) `mp_roundtime 15`
+- (Optional) `mp_maxrounds 4`
+
 ## Additional Features:
 - Turned off all tertiary and secondary resource resource points
 - No building within x distance of primary resource point
