@@ -91,14 +91,28 @@ enum eNDRoundEndReason
     /**
      * Allows a plugin to block a structure form being built by returning Plugin_Stop.
      *
-     * @param client                client index of the Commander who attempted to build the structures
-     * @param structures            type of structure being built (see ND_Structures)
-     * @param x                     float x coordinate of where structure is being built
-     * @param y                     float y coordinate of where structure is being built
-     * @param z                     float z coordinate of where structure is being built
-     * @return						Action that should be taken (Plugin_Stop to prevent building)
+     * @param client                    client index of the Commander who attempted to build the structures
+     * @param ND_Structures structure   type of structure being built
+     * @param float position[3]         x,y,z coordinate of where structure is being built
+     * @return                          Action that should be taken (Plugin_Stop to prevent building)
      */
-    forward Action ND_OnCommanderBuildStructure(client, ND_Structures structure, float x, float y, float z);
+    forward Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, float position[3]);
+
+    // This helper function will display red text and a failed sound to the commander
+    stock void UTIL_Commander_FailureText(int iClient, char sMessage[64])
+    {
+        ClientCommand(iClient, "play buttons/button7");
+
+        Handle hBfCommanderText;
+        hBfCommanderText = StartMessageOne("CommanderNotice", iClient, USERMSG_BLOCKHOOKS);
+        BfWriteString(hBfCommanderText, sMessage);
+        EndMessage();
+
+        // clear other messages from notice area
+        hBfCommanderText = StartMessageOne("CommanderNotice", iClient, USERMSG_BLOCKHOOKS);
+        BfWriteString(hBfCommanderText, "");
+        EndMessage();
+    }
 
 #endif
 
@@ -309,7 +323,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.10"
+#define PLUGIN_VERSION "1.0.11"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
