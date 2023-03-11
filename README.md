@@ -7,6 +7,7 @@ Teams fight over control of the Primary Resource Point in timed round matches.
 The team who controls Prime for the longest amount of time will win the round.
 
 ## Installation:
+- Install the ``[ND] Build Structure Intercept`` plugin (https://forums.alliedmods.net/showthread.php?p=2796149)
 - (Optional) `mp_roundtime 15`
 - (Optional) `mp_maxrounds 4`
 
