@@ -10,8 +10,8 @@ The team who controls Prime for the longest amount of time will win the round.
 - (Optional) `mp_roundtime 15`
 - (Optional) `mp_maxrounds 4`
 
-## Additional Features:
-- Turned off all tertiary and secondary resource resource points
+## Gameplay Features:
+- Turns off all tertiary and secondary resource resource points
 - No building within x distance of primary resource point
 - No artillery shelling within x distance of primary resource point
 - No commander abilities within x distance of primary resource point
