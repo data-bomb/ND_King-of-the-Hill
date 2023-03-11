@@ -34,7 +34,8 @@
 #define WIRELESS_REPEATER_COST  2000
 #define TRANSPORT_GATE_COST     1500
 #define CAPTURE_REWARD          5000
-#define KILL_REWARD             200
+#define TRICKLE_CREDIT          200
+#define KILL_REWARD             500
 #define ABILITY_COST            2000
 
 #define MAX_ABILITY_DISTANCE_FROM_PRIMARY 900.0
@@ -308,7 +309,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.6"
+#define PLUGIN_VERSION "1.0.7"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -958,7 +959,17 @@ public Action MessageHook_RecieveResources(UserMsg hMessageId, BfRead hBitBuffer
         hReceiveData.WriteCell(iTeam);
         hReceiveData.WriteCell(iResources);
         hReceiveData.Reset(false);
-        CreateTimer(0.0, Timer_IssueDebit, hReceiveData, TIMER_FLAG_NO_MAPCHANGE);
+
+        // increase trickle credits but take back resource point extraction credits
+        if (iResources > 100)
+        {
+            CreateTimer(0.0, Timer_IssueDebit, hReceiveData, TIMER_FLAG_NO_MAPCHANGE);
+        }
+        else
+        {
+            CreateTimer(0.0, Timer_IncreaseCredit, hReceiveData, TIMER_FLAG_NO_MAPCHANGE);
+        }
+
         return Plugin_Handled;
     }
 
@@ -971,6 +982,15 @@ public Action Timer_IssueDebit(Handle hTimer, DataPack hReceiveData)
     int iResources = hReceiveData.ReadCell();
     delete hReceiveData;
     SDKCall(g_hSDKCall_SpendResources, iTeam, iResources, eNDTransaction_Extraction);
+
+    return Plugin_Stop;
+}
+
+public Action Timer_IncreaseCredit(Handle hTimer, DataPack hReceiveData)
+{
+    int iTeam = hReceiveData.ReadCell();
+    delete hReceiveData;
+    SDKCall(g_hSDKCall_ReceiveResources, iTeam, TRICKLE_CREDIT, eNDTransaction_Support);
 
     return Plugin_Stop;
 }
