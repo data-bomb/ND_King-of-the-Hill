@@ -309,7 +309,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.7"
+#define PLUGIN_VERSION "1.0.8"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -674,6 +674,12 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
     if (g_hTimer_TerminateRound != INVALID_HANDLE)
     {
         CloseHandle(g_hTimer_TerminateRound);
+    }
+
+    // check for an invalid round time and provides default 15 min roundtime
+    if (g_cRoundTime.IntValue < 0)
+    {
+        g_cRoundTime.SetInt(15, true, true);
     }
 
     // determine when to end the round
