@@ -7,10 +7,12 @@
             "CNDPlayer::GetEntity"
             {
                 "linux"     "6"
+                "windows"   "5"
             }
             "CBaseEntity::GetEntity"
             {
                 "linux"     "6"
+                "windows"   "5"
             }
         }
         "Signatures"
