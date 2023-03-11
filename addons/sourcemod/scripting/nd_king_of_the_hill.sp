@@ -309,7 +309,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.9"
+#define PLUGIN_VERSION "1.0.10"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -357,6 +357,8 @@ public void OnAllPluginsLoaded()
 
 public void OnPluginStart()
 {
+    CreateConVar("nd_koth_version", PLUGIN_VERSION, "ND King of the Hill Version", FCVAR_SPONLY|FCVAR_DONTRECORD|FCVAR_REPLICATED|FCVAR_NOTIFY);
+
     GameData hGameDataResource = new GameData("resource-points.games");
     if (!hGameDataResource)
     {
