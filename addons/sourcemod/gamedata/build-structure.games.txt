@@ -29,6 +29,12 @@
                 "linux"     "@_ZN9CNDPlayer33Commander_BuildEmergencyAssemblerEiRK6VectorRK6QAnglei"
                 "windows"   "\x55\x8B\xEC\xA1\x2A\x2A\x2A\x2A\x83\xEC\x20\x56"
             }
+            "CNuclearDawn::GetCommandBunkerForTeam"
+            {
+                "library"   "server"
+                "linux"     "@_ZN12CNuclearDawn23GetCommandBunkerForTeamEi"
+                "windows"   "\x55\x8B\xEC\x8B\x45\x2A\x8B\x94\x81\x54\x04\x00\x00"
+            }
             "SellActionHandlerObject::Run"
             {
                 "library"   "server"
