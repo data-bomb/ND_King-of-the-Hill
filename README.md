@@ -15,6 +15,7 @@ The team who controls Prime for the longest amount of time will win the round.
 - Copy the `terminate-round.games.txt` file to the addons/sourcemod/gamedata/ directory
 - (Optional) Add `mp_roundtime 15` to the cfg/server.cfg file
 - (Optional) Add `mp_maxrounds 4` to the cfg/server.cfg file
+- (Optional) Add `sv_tags "kingofthehill"` to the cfg/server.cfg file
 
 ## Gameplay Features:
 - Turns off all tertiary and secondary resource resource points
