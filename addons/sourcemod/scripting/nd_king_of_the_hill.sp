@@ -678,6 +678,15 @@ public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcas
     return Plugin_Continue;
 }
 
+public OnConfigsExecuted()
+{
+    // check for an invalid round time and provides default 15 min roundtime
+    if (g_cRoundTime.IntValue < 0)
+    {
+        g_cRoundTime.SetInt(15, true, true);
+    }
+}
+
 public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcast)
 {
     g_bGameStarted = true;
@@ -692,12 +701,6 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
         CloseHandle(g_hTimer_TerminateRound);
     }
 
-    // check for an invalid round time and provides default 15 min roundtime
-    if (g_cRoundTime.IntValue < 0)
-    {
-        g_cRoundTime.SetInt(15, true, true);
-    }
-
     // determine when to end the round
     g_hTimer_TerminateRound = CreateTimer(60.0*float(g_cRoundTime.IntValue)-1.0, Timer_TerminateRound, _, TIMER_FLAG_NO_MAPCHANGE);
     // calculate time needed (in seconds) to clinch victory
@@ -707,15 +710,12 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
     PrintToServer("Clinch time set to %d seconds.", iClinchTime);
     #endif
 
-    ND_FindMapEntities();
-
     // keep track of the score
     CreateTimer(1.0, Timer_UpdateScore, iClinchTime, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 
     // protect all starting structures from damage
     char sEntityName[32];
     int iMaxEntities = GetMaxEntities();
-    int iTeamNum;
     for (int iEntityIndex = MaxClients; iEntityIndex < iMaxEntities; iEntityIndex++)
     {
         if (IsValidEntity(iEntityIndex) && IsValidEdict(iEntityIndex))
@@ -728,20 +728,6 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
                 #endif
 
                 SDKHook(iEntityIndex, SDKHook_OnTakeDamage, Starting_Structure_Protection);
-
-                // save command bunkers for later
-                if (!strcmp(sEntityName, "struct_command_bunker"))
-                {
-                    iTeamNum = GetEntProp(iEntityIndex, Prop_Send, "m_iTeamNum", 4);
-                    if (iTeamNum == TEAM_EMPIRE)
-                    {
-                        GetEntPropVector(iEntityIndex, Prop_Data, "m_vecOrigin", g_fBunkerEmpirePosition);
-                    }
-                    else if (iTeamNum == TEAM_CONSORT)
-                    {
-                        GetEntPropVector(iEntityIndex, Prop_Data, "m_vecOrigin", g_fBunkerConsortPosition);
-                    }
-                }
             }
         }
     }
@@ -759,6 +745,8 @@ public OnMapStart()
 {
     g_bGameStarted = false;
     g_iKingOfTheHillTeam = 0;
+
+    ND_FindMapEntities();
 }
 
 public Action Starting_Structure_Protection(int victim, int& attacker, int& inflictor, float& damage, int& damagetype, int& weapon, float damageForce[3], float damagePosition[3])
@@ -814,6 +802,10 @@ public Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, flo
     float fDistanceToConsortBunker = GetVectorDistance(position, g_fBunkerConsortPosition);
     int iTeam = GetClientTeam(client);
 
+    #if defined DEBUG
+    PrintToServer("distance to empire %2.f distance to consort %2.f", fDistanceToEmpireBunker, fDistanceToConsortBunker);
+    #endif
+
     if (iTeam == TEAM_EMPIRE && fDistanceToEmpireBunker > fDistanceToConsortBunker)
     {
         UTIL_Commander_FailureText(client, "BUILDING TOO CLOSE TO ENEMY BUNKER.");
@@ -829,15 +821,11 @@ public Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, flo
         UTIL_Commander_FailureText(client, "BUILDING TOO CLOSE TO ENEMY BUNKER.");
 
         #if defined DEBUG
-        PrintToServer("blocked consort building %d too far away form bunker", structure);
+        PrintToServer("blocked consort building %d too far away from bunker", structure);
         #endif
 
         return Plugin_Stop;
     }
-
-    #if defined DEBUG
-    PrintToServer("distance to empire %2.f distance to consort %2.f", fDistanceToEmpireBunker, fDistanceToConsortBunker);
-    #endif
 
     return Plugin_Continue;
 }
@@ -1074,4 +1062,34 @@ stock void ND_FindMapEntities()
     // find and save team entities
     g_iTeamEntity[TEAM_CONSORT-2] = FindEntityByClassname(-1, "nd_team_consortium");
     g_iTeamEntity[TEAM_EMPIRE-2] = FindEntityByClassname(-1, "nd_team_empire");
+
+    // find bunker positions
+    char sEntityName[32];
+    int iMaxEntities = GetMaxEntities();
+    int iTeamNum;
+    for (int iEntityIndex = MaxClients; iEntityIndex < iMaxEntities; iEntityIndex++)
+    {
+        if (IsValidEntity(iEntityIndex) && IsValidEdict(iEntityIndex))
+        {
+            GetEdictClassname(iEntityIndex, sEntityName, sizeof(sEntityName));
+            // save command bunkers for later
+            if (!strcmp(sEntityName, "struct_command_bunker"))
+            {
+                iTeamNum = GetEntProp(iEntityIndex, Prop_Send, "m_iTeamNum", 4);
+                if (iTeamNum == TEAM_EMPIRE)
+                {
+                    GetEntPropVector(iEntityIndex, Prop_Data, "m_vecOrigin", g_fBunkerEmpirePosition);
+                }
+                else if (iTeamNum == TEAM_CONSORT)
+                {
+                    GetEntPropVector(iEntityIndex, Prop_Data, "m_vecOrigin", g_fBunkerConsortPosition);
+                }
+            }
+        }
+    }
+
+    #if defined DEBUG
+    PrintToServer("empire bunker position is %2.f %2.f %2.f", g_fBunkerEmpirePosition[0], g_fBunkerEmpirePosition[1], g_fBunkerEmpirePosition[2]);
+    PrintToServer("consort bunker position is %2.f %2.f %2.f", g_fBunkerConsortPosition[0], g_fBunkerConsortPosition[1], g_fBunkerConsortPosition[2]);
+    #endif
 }
