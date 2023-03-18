@@ -19,6 +19,7 @@ The team who controls Prime for the longest amount of time will win the round.
 
 ## Gameplay Features:
 - Turns off all tertiary and secondary resource resource points
+- Increases trickle income from 1,200/minute to 3,600/minute
 - No building within 1,300 distance of primary resource point
 - No artillery shelling within 900 distance of primary resource point
 - No commander abilities within 900 distance of primary resource point
