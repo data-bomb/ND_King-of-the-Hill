@@ -323,7 +323,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.12"
+#define PLUGIN_VERSION "1.0.13"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -739,6 +739,7 @@ public OnMapEnd()
 {
     g_bGameStarted = false;
     g_iKingOfTheHillTeam = 0;
+    g_hTimer_TerminateRound = INVALID_HANDLE;
 }
 
 public OnMapStart()
