@@ -339,7 +339,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.18"
+#define PLUGIN_VERSION "1.0.19"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -1108,7 +1108,13 @@ stock void DisplayScoreOnHud()
     {
         if (IsClientInGame(iClient))
         {
-            ShowSyncHudText(iClient, hHudScoreText, "Empire         %d\nConsortium  %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
+            // skip commanders
+            int iTeam = GetClientTeam(iClient);
+            bool bIsCommander = (GameRules_GetPropEnt("m_hCommanders", iTeam-2) == iClient);
+            if (!bIsCommander)
+            {
+                ShowSyncHudText(iClient, hHudScoreText, "Empire         %d\nConsortium  %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
+            }
         }
     }
     CloseHandle(hHudScoreText);
