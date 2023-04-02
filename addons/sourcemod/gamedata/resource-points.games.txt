@@ -42,7 +42,7 @@
                 "signature" "CNDPlayerBot::SelectResourcePointToCapture"
                 "callconv"  "thiscall"
                 "return"    "cbaseentity"
-                "this"      "entity"
+                "this"      "address"
                 "arguments"
                 {
                     "position"
