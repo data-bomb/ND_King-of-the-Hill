@@ -28,7 +28,7 @@
 
 #pragma semicolon 1
 
-//#define DEBUG 1
+#define DEBUG 1
 
 #define RELAY_TOWER_COST        1750
 #define WIRELESS_REPEATER_COST  2000
@@ -311,6 +311,12 @@ enum eNDRoundEndReason
 
 #endif
 
+#if !defined INVALID_ENTITY
+    #define INVALID_ENTITY -1
+#else
+    #assert INVALID_ENTITY == -1
+#endif 
+
 #define MAYCAPTURE_PARAM_TEAM               1
 #define MAYCAPTURE_PARAM_RESOURCE_POINT     2
 
@@ -331,7 +337,7 @@ bool g_bGameStarted = false;
 int g_iKingOfTheHillTeam = 0;
 int g_iScore[2] = {0, 0};
 int g_iTeamEntity[2] = {-1, -1};
-int g_iPrimaryPointEntityRef = INVALID_ENT_REFERENCE;
+int g_iPrimaryPointEntity = INVALID_ENTITY;
 Handle g_hSDKCall_ReceiveResources = INVALID_HANDLE;
 Handle g_hSDKCall_SpendResources = INVALID_HANDLE;
 Handle g_hSDKCall_SetRoundWinner = INVALID_HANDLE;
@@ -835,10 +841,13 @@ MRESReturn Detour_SelectDefensePoint(DHookReturn hReturn, DHookParam hParams)
 {
     int iResourcePoint = DHookGetReturn(hReturn);
 
-    if (iResourcePoint != 0)
+    if ((iResourcePoint > MaxClients) && (g_iPrimaryPointEntity != iResourcePoint) && (g_iPrimaryPointEntity != INVALID_ENTITY))
     {
-        int iPrimaryPoint = EntRefToEntIndex(g_iPrimaryPointEntityRef);
-        DHookSetReturn(hReturn, iPrimaryPoint);
+        #if defined DEBUG
+        PrintToServer("Bot Select Defense RP Overrode to %d from %d", g_iPrimaryPointEntity, iResourcePoint);
+        #endif
+
+        DHookSetReturn(hReturn, g_iPrimaryPointEntity);
         return MRES_Override;
     }
 
@@ -849,10 +858,13 @@ MRESReturn Detour_SelectCapturePoint(DHookReturn hReturn, DHookParam hParams)
 {
     int iResourcePoint = DHookGetReturn(hReturn);
 
-    if (iResourcePoint != 0)
+    if ((iResourcePoint > MaxClients) && (g_iPrimaryPointEntity != iResourcePoint) && (g_iPrimaryPointEntity != INVALID_ENTITY))
     {
-        int iPrimaryPoint = EntRefToEntIndex(g_iPrimaryPointEntityRef);
-        DHookSetReturn(hReturn, iPrimaryPoint);
+        #if defined DEBUG
+        PrintToServer("Bot Select Capture RP Overrode to %d from %d", g_iPrimaryPointEntity, iResourcePoint);
+        #endif
+
+        DHookSetReturn(hReturn, g_iPrimaryPointEntity);
         return MRES_Override;
     }
 
@@ -1052,17 +1064,16 @@ public Action Timer_UpdateScore(Handle hTimer, any iClinchTime)
 stock void ND_FindMapEntities()
 {
     // find and save the single primary resource point for the map
-    int iPrimaryPointEntity = FindEntityByClassname(-1, "nd_info_primary_resource_point");
-    g_iPrimaryPointEntityRef = EntIndexToEntRef(iPrimaryPointEntity);
-    GetEntPropVector(iPrimaryPointEntity, Prop_Data, "m_vecOrigin", g_fPrimaryPointPosition);
+    g_iPrimaryPointEntity = FindEntityByClassname(INVALID_ENTITY, "nd_info_primary_resource_point");
+    GetEntPropVector(g_iPrimaryPointEntity, Prop_Data, "m_vecOrigin", g_fPrimaryPointPosition);
 
     #if defined DEBUG
-    PrintToServer("primary point position is %2.f %2.f %2.f", g_fPrimaryPointPosition[0], g_fPrimaryPointPosition[1], g_fPrimaryPointPosition[2]);
+    PrintToServer("primary point (%d) position is %2.f %2.f %2.f", g_iPrimaryPointEntity, g_fPrimaryPointPosition[0], g_fPrimaryPointPosition[1], g_fPrimaryPointPosition[2]);
     #endif
 
     // find and save team entities
-    g_iTeamEntity[TEAM_CONSORT-2] = FindEntityByClassname(-1, "nd_team_consortium");
-    g_iTeamEntity[TEAM_EMPIRE-2] = FindEntityByClassname(-1, "nd_team_empire");
+    g_iTeamEntity[TEAM_CONSORT-2] = FindEntityByClassname(INVALID_ENTITY, "nd_team_consortium");
+    g_iTeamEntity[TEAM_EMPIRE-2] = FindEntityByClassname(INVALID_ENTITY, "nd_team_empire");
 
     // find bunker positions
     char sEntityName[32];
