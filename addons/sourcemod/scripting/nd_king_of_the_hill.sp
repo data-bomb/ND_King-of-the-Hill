@@ -339,7 +339,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.16"
+#define PLUGIN_VERSION "1.0.17"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -876,7 +876,7 @@ MRESReturn Detour_SelectDefensePoint(DHookReturn hReturn, DHookParam hParams)
     return MRES_Ignored;
 }
 
-MRESReturn Detour_SelectCapturePoint(DHookReturn hReturn, DHookParam hParams)
+MRESReturn Detour_SelectCapturePoint(Address pThisCNDPlayerBot, DHookReturn hReturn, DHookParam hParams)
 {
     int iResourcePoint = DHookGetReturn(hReturn);
 
@@ -885,8 +885,20 @@ MRESReturn Detour_SelectCapturePoint(DHookReturn hReturn, DHookParam hParams)
         #if defined DEBUG
         PrintToServer("Bot Select Capture RP Overrode to %d from %d", g_iPrimaryPointEntity, iResourcePoint);
         #endif
+        
+        // check if bot already has prime
+        int iBot = SDKCall(g_hSDKCall_GetEntity, pThisCNDPlayerBot);
+        int iTeam = GetClientTeam(iBot);
 
-        DHookSetReturn(hReturn, g_iPrimaryPointEntity);
+        if (iTeam == g_iKingOfTheHillTeam)
+        {
+             DHookSetReturn(hReturn, 0);
+        }
+        else
+        {
+            DHookSetReturn(hReturn, g_iPrimaryPointEntity);
+        }
+
         return MRES_Override;
     }
 
