@@ -28,7 +28,7 @@
 
 #pragma semicolon 1
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #define RELAY_TOWER_COST        1750
 #define WIRELESS_REPEATER_COST  2000
@@ -329,7 +329,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.13"
+#define PLUGIN_VERSION "1.0.14"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
