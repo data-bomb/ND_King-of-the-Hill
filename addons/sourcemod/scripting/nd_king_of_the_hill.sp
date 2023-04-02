@@ -28,7 +28,7 @@
 
 #pragma semicolon 1
 
-//#define DEBUG 1
+#define DEBUG 1
 
 #define RELAY_TOWER_COST        1750
 #define WIRELESS_REPEATER_COST  2000
@@ -43,6 +43,9 @@
 
 #define HUDSCORE_ALPHA          90
 #define HUDSCORE_HOLD           1.0
+#define HUDSCORE_HOLD_ENDGAME   15.0
+#define HUDSCORE_OFFSET_X       0.1
+#define HUDSCORE_OFFSET_Y       0.8
 
 #define GET_ENTITY_OFFSET 6
 
@@ -339,12 +342,13 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.19"
+#define PLUGIN_VERSION "1.0.20"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
 bool g_bGameStarted = false;
 int g_iKingOfTheHillTeam = 0;
+bool g_bInCommanderChair[MAXPLAYERS+1];
 int g_iScore[2] = {0, 0};
 int g_iTeamEntity[2] = {-1, -1};
 int g_iPrimaryPointEntity = INVALID_ENTITY;
@@ -556,6 +560,8 @@ public void OnPluginStart()
     HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
     HookEvent("player_changeclass", Event_PlayerClass, EventHookMode_Post);
     HookEvent("round_win", Event_RoundWin, EventHookMode_Post);
+    HookEvent("player_entered_commander_mode", Event_SittingCommander, EventHookMode_Post);
+    HookEvent("player_left_commander_mode", Event_PlayingCommander, EventHookMode_Post);
 
     if (g_bLateLoad)
     {
@@ -583,8 +589,23 @@ void KingOfTheHill_EndRound()
 public Action Event_PlayerSpawn(Event event, const char[] sName, bool bDontBroadcast)
 {
     int iPlayer = GetClientOfUserId(event.GetInt("userid"));
+    g_bInCommanderChair[iPlayer] = false;
     ND_LimitNadesForLeader(iPlayer);
 
+    return Plugin_Continue;
+}
+
+public Action Event_SittingCommander(Event event, const char[] sName, bool bDontBroadcast)
+{
+    int iPlayer = GetClientOfUserId(event.GetInt("userid"));
+    g_bInCommanderChair[iPlayer] = true;
+    return Plugin_Continue;
+}
+
+public Action Event_PlayingCommander(Event event, const char[] sName, bool bDontBroadcast)
+{
+    int iPlayer = GetClientOfUserId(event.GetInt("userid"));
+    g_bInCommanderChair[iPlayer] = false;
     return Plugin_Continue;
 }
 
@@ -690,8 +711,8 @@ public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcas
     g_bGameStarted = false;
     g_iKingOfTheHillTeam = 0;
 
-    PrintToChatAll("Consort score: %d", g_iScore[TEAM_CONSORT-2]);
-    PrintToChatAll("Empire score:  %d", g_iScore[TEAM_EMPIRE-2]);
+    DisplayScoreOnHud(true);
+
     return Plugin_Continue;
 }
 
@@ -709,6 +730,10 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
     g_bGameStarted = true;
     g_iKingOfTheHillTeam = 0;
     g_iScore = {0, 0};
+    for (int iPlayer = 1; iPlayer <= MaxClients; iPlayer++)
+    {
+        g_bInCommanderChair[iPlayer] = false;
+    }
 
     ND_FindMapEntities();
 
@@ -1090,28 +1115,37 @@ public Action Timer_UpdateScore(Handle hTimer, any iClinchTime)
         return Plugin_Stop;
     }
 
-    DisplayScoreOnHud();
-
     if (!g_bGameStarted)
     {
         return Plugin_Stop;
     }
 
+    DisplayScoreOnHud();
+    
     return Plugin_Continue;
 }
 
-stock void DisplayScoreOnHud()
+stock void DisplayScoreOnHud(bool bEndGame = false)
 {
     Handle hHudScoreText = CreateHudSynchronizer();
-    SetHudTextParams(0.1, 0.8, HUDSCORE_HOLD, g_iScoreHudColor[Red], g_iScoreHudColor[Green], g_iScoreHudColor[Blue], HUDSCORE_ALPHA);
+    if (bEndGame)
+    {
+        SetHudTextParams(HUDSCORE_OFFSET_X, HUDSCORE_OFFSET_Y, HUDSCORE_HOLD_ENDGAME, \
+        g_iScoreHudColor[Red], g_iScoreHudColor[Green], g_iScoreHudColor[Blue], HUDSCORE_ALPHA);
+
+    }
+    else
+    {
+        SetHudTextParams(HUDSCORE_OFFSET_X, HUDSCORE_OFFSET_Y, HUDSCORE_HOLD, \
+        g_iScoreHudColor[Red], g_iScoreHudColor[Green], g_iScoreHudColor[Blue], HUDSCORE_ALPHA);
+    }
+
     for (int iClient = 1; iClient <= MaxClients; iClient++)
     {
         if (IsClientInGame(iClient))
         {
-            // skip commanders
-            int iTeam = GetClientTeam(iClient);
-            bool bIsCommander = (GameRules_GetPropEnt("m_hCommanders", iTeam-2) == iClient);
-            if (!bIsCommander)
+            // skip commanders sitting in chairs
+            if (!g_bInCommanderChair[iClient])
             {
                 ShowSyncHudText(iClient, hHudScoreText, "Empire         %d\nConsortium  %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
             }
