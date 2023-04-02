@@ -41,6 +41,9 @@
 #define MAX_ABILITY_DISTANCE_FROM_PRIMARY 900.0
 #define MAX_STRUCT_DISTANCE_FROM_PRIMARY 1300.0
 
+#define HUDSCORE_ALPHA          90
+#define HUDSCORE_HOLD           1.0
+
 #define GET_ENTITY_OFFSET 6
 
 enum eNDResourceTransactionType
@@ -54,6 +57,13 @@ enum eNDResourceTransactionType
     eNDTransaction_Commander,
     eNDTransaction_Support,
     eNDTransaction_type8
+}
+
+enum HudColor
+{
+    Red = 0,
+    Green,
+    Blue
 }
 
 enum eNDResourcePoint
@@ -329,7 +339,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.15"
+#define PLUGIN_VERSION "1.0.16"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -346,6 +356,7 @@ Handle g_hTimer_TerminateRound = INVALID_HANDLE;
 float g_fPrimaryPointPosition[3] = {-1.0, -1.0, -1.0};
 float g_fBunkerEmpirePosition[3] = {-1.0, -1.0, -1.0};
 float g_fBunkerConsortPosition[3] = {-1.0, -1.0, -1.0};
+static const int g_iScoreHudColor[3] = {250, 200, 20};
 
 public Plugin myinfo =
 {
@@ -795,16 +806,25 @@ public Action Structure_Damage_Attenuation(int victim, int& attacker, int& infli
 
 public Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, float position[3])
 {
+
     float fDistanceFromPrimaryPoint = GetVectorDistance(position, g_fPrimaryPointPosition);
     if (fDistanceFromPrimaryPoint < MAX_STRUCT_DISTANCE_FROM_PRIMARY)
     {
-        UTIL_Commander_FailureText(client, "BUILDING TOO CLOSE TO PRIMARY POINT.");
+        // block all turrets, artillery, and walls near prime
+        if (structure == ND_MG_Turret || structure == ND_Artillery || structure >= ND_FT_Turret)
+        {
+            UTIL_Commander_FailureText(client, "NO OFFENSIVE BLDGS NEAR PRIMARY POINT.");
 
-        #if defined DEBUG
-        PrintToServer("blocked building %d too near primary point", structure);
-        #endif
+            #if defined DEBUG
+            PrintToServer("blocked building %d too near primary point", structure);
+            #endif
 
-        return Plugin_Stop;
+            return Plugin_Stop;
+        }
+        else
+        {
+            return Plugin_Continue;
+        }
     }
 
     float fDistanceToEmpireBunker = GetVectorDistance(position, g_fBunkerEmpirePosition);
@@ -1053,7 +1073,10 @@ public Action Timer_UpdateScore(Handle hTimer, any iClinchTime)
     if (g_iScore[TEAM_CONSORT-2] >= iClinchTime || g_iScore[TEAM_EMPIRE-2] >= iClinchTime)
     {
         KingOfTheHill_EndRound();
+        return Plugin_Stop;
     }
+
+    DisplayScoreOnHud();
 
     if (!g_bGameStarted)
     {
@@ -1061,6 +1084,20 @@ public Action Timer_UpdateScore(Handle hTimer, any iClinchTime)
     }
 
     return Plugin_Continue;
+}
+
+stock void DisplayScoreOnHud()
+{
+    Handle hHudScoreText = CreateHudSynchronizer();
+    SetHudTextParams(0.1, 0.8, HUDSCORE_HOLD, g_iScoreHudColor[Red], g_iScoreHudColor[Green], g_iScoreHudColor[Blue], HUDSCORE_ALPHA);
+    for (int iClient = 1; iClient <= MaxClients; iClient++)
+    {
+        if (IsClientInGame(iClient))
+        {
+            ShowSyncHudText(iClient, hHudScoreText, "Empire         %d\nConsortium  %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
+        }
+    }
+    CloseHandle(hHudScoreText);
 }
 
 stock void ND_FindMapEntities()
