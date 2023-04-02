@@ -28,7 +28,7 @@
 
 #pragma semicolon 1
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #define RELAY_TOWER_COST        1750
 #define WIRELESS_REPEATER_COST  2000
@@ -342,7 +342,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.20"
+#define PLUGIN_VERSION "1.0.21"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -577,12 +577,20 @@ void KingOfTheHill_EndRound()
     {
         // stalemate
         SDKCall(g_hSDKCall_SetRoundWinner, 0, view_as<int>(eNDRoundEnd_Stalemate));
+        
+        #if defined DEBUG
+        PrintToServer("Terminate Round as Stalemate with Empire %d and Consort %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
+        #endif
     }
     else
     {
         int iWinningTeam = (g_iScore[TEAM_CONSORT-2] > g_iScore[TEAM_EMPIRE-2] ? TEAM_CONSORT : TEAM_EMPIRE);
         // other team "eliminated"
         SDKCall(g_hSDKCall_SetRoundWinner, iWinningTeam, view_as<int>(eNDRoundEnd_Eliminated));
+
+        #if defined DEBUG
+        PrintToServer("Terminate Round as Eliminated with Empire %d and Consort %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
+        #endif
     }
 }
 
@@ -711,7 +719,8 @@ public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcas
     g_bGameStarted = false;
     g_iKingOfTheHillTeam = 0;
 
-    DisplayScoreOnHud(true);
+    PrintToChatAll("\x05[Consortium Score] %d", g_iScore[TEAM_CONSORT-2]);
+    PrintToChatAll("\x05       [Empire Score] %d", g_iScore[TEAM_EMPIRE-2]);
 
     return Plugin_Continue;
 }
@@ -1125,20 +1134,12 @@ public Action Timer_UpdateScore(Handle hTimer, any iClinchTime)
     return Plugin_Continue;
 }
 
-stock void DisplayScoreOnHud(bool bEndGame = false)
+stock void DisplayScoreOnHud()
 {
     Handle hHudScoreText = CreateHudSynchronizer();
-    if (bEndGame)
-    {
-        SetHudTextParams(HUDSCORE_OFFSET_X, HUDSCORE_OFFSET_Y, HUDSCORE_HOLD_ENDGAME, \
-        g_iScoreHudColor[Red], g_iScoreHudColor[Green], g_iScoreHudColor[Blue], HUDSCORE_ALPHA);
 
-    }
-    else
-    {
-        SetHudTextParams(HUDSCORE_OFFSET_X, HUDSCORE_OFFSET_Y, HUDSCORE_HOLD, \
+    SetHudTextParams(HUDSCORE_OFFSET_X, HUDSCORE_OFFSET_Y, HUDSCORE_HOLD, \
         g_iScoreHudColor[Red], g_iScoreHudColor[Green], g_iScoreHudColor[Blue], HUDSCORE_ALPHA);
-    }
 
     for (int iClient = 1; iClient <= MaxClients; iClient++)
     {
@@ -1151,6 +1152,7 @@ stock void DisplayScoreOnHud(bool bEndGame = false)
             }
         }
     }
+
     CloseHandle(hHudScoreText);
 }
 
