@@ -339,7 +339,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.17"
+#define PLUGIN_VERSION "1.0.18"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -881,21 +881,23 @@ MRESReturn Detour_SelectCapturePoint(Address pThisCNDPlayerBot, DHookReturn hRet
     int iResourcePoint = DHookGetReturn(hReturn);
 
     if ((iResourcePoint > MaxClients) && (g_iPrimaryPointEntity != iResourcePoint) && (g_iPrimaryPointEntity != INVALID_ENTITY))
-    {
-        #if defined DEBUG
-        PrintToServer("Bot Select Capture RP Overrode to %d from %d", g_iPrimaryPointEntity, iResourcePoint);
-        #endif
-        
+    {   
         // check if bot already has prime
         int iBot = SDKCall(g_hSDKCall_GetEntity, pThisCNDPlayerBot);
         int iTeam = GetClientTeam(iBot);
 
         if (iTeam == g_iKingOfTheHillTeam)
         {
-             DHookSetReturn(hReturn, 0);
+            #if defined DEBUG
+            PrintToServer("Bot Select Capture RP Overrode to <INVALID> from %d", iResourcePoint);
+            #endif
+            DHookSetReturn(hReturn, INVALID_ENT_REFERENCE);
         }
         else
         {
+            #if defined DEBUG
+            PrintToServer("Bot Select Capture RP Overrode to %d from %d", g_iPrimaryPointEntity, iResourcePoint);
+            #endif
             DHookSetReturn(hReturn, g_iPrimaryPointEntity);
         }
 
