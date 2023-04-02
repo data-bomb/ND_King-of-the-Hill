@@ -342,7 +342,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.21"
+#define PLUGIN_VERSION "1.0.22"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -844,8 +844,8 @@ public Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, flo
     float fDistanceFromPrimaryPoint = GetVectorDistance(position, g_fPrimaryPointPosition);
     if (fDistanceFromPrimaryPoint < MAX_STRUCT_DISTANCE_FROM_PRIMARY)
     {
-        // block all turrets, artillery, and walls near prime
-        if (structure == ND_MG_Turret || structure == ND_Artillery || structure >= ND_FT_Turret)
+        // block all spawns, turrets, artillery, and walls near prime
+        if (structure <= ND_Transport_Gate || structure == ND_Artillery || structure >= ND_FT_Turret)
         {
             UTIL_Commander_FailureText(client, "NO OFFENSIVE BLDGS NEAR PRIMARY POINT.");
 
