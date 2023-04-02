@@ -28,7 +28,7 @@
 
 #pragma semicolon 1
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #define RELAY_TOWER_COST        1750
 #define WIRELESS_REPEATER_COST  2000
