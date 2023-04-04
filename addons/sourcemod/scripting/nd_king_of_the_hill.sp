@@ -21,6 +21,8 @@
 #include <dhooks>
 #include <sdkhooks>
 
+#include <multicolors>
+
 #tryinclude <nd_commander_build>
 #tryinclude <nd_structures>
 #tryinclude <nd_ammo>
@@ -330,8 +332,11 @@ enum eNDRoundEndReason
     #assert INVALID_ENTITY == -1
 #endif 
 
-#define MAYCAPTURE_PARAM_TEAM               1
-#define MAYCAPTURE_PARAM_RESOURCE_POINT     2
+#define PLAYER_MAY_CAP_PARAM_RESOURCE_POINT 3
+#define PLAYER_MAY_CAP_PARAM_CNDPLAYER      2
+
+#define TEAM_MAY_CAP_PARAM_TEAM             1
+#define TEAM_MAY_CAP_PARAM_RESOURCE_POINT   2
 
 #define COMMANDER_ABILITY_PARAM_CNDPLAYER   1
 #define COMMANDER_ABILITY_PARAM_POSITION    2
@@ -342,7 +347,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.22"
+#define PLUGIN_VERSION "1.0.23"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -400,14 +405,14 @@ public void OnPluginStart()
         SetFailState("Failed to find gamedata/resource-points.games.txt");
     }
 
-    DynamicDetour detourPlayerBuildStructure = DynamicDetour.FromConf(hGameDataResource, "CNuclearDawn::TeamMayCapturePoint");
-    if (!detourPlayerBuildStructure)
+    DynamicDetour detourPlayerCapturePoint = DynamicDetour.FromConf(hGameDataResource, "CNuclearDawn::PlayerMayCapturePoint");
+    if (!detourPlayerCapturePoint)
     {
-        SetFailState("Failed to find signature CNuclearDawn::TeamMayCapturePoint");
+        SetFailState("Failed to find signature CNuclearDawn::PlayerMayCapturePoint");
     }
 
-    detourPlayerBuildStructure.Enable(Hook_Pre, Detour_TeamMayCapturePoint);
-    delete detourPlayerBuildStructure;
+    detourPlayerCapturePoint.Enable(Hook_Post, Detour_PlayerMayCapturePoint);
+    delete detourPlayerCapturePoint;
 
     DynamicDetour detourSelectPointToCapture = DynamicDetour.FromConf(hGameDataResource, "CNDPlayerBot::SelectResourcePointToCapture");
     if (!detourSelectPointToCapture)
@@ -719,8 +724,8 @@ public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcas
     g_bGameStarted = false;
     g_iKingOfTheHillTeam = 0;
 
-    PrintToChatAll("\x05[Consortium Score] %d", g_iScore[TEAM_CONSORT-2]);
-    PrintToChatAll("\x05       [Empire Score] %d", g_iScore[TEAM_EMPIRE-2]);
+    CPrintToChatAll("\x05[Consortium Score] %d", g_iScore[TEAM_CONSORT-2]);
+    CPrintToChatAll("\x05       [Empire Score] %d", g_iScore[TEAM_EMPIRE-2]);
 
     return Plugin_Continue;
 }
@@ -941,23 +946,36 @@ MRESReturn Detour_SelectCapturePoint(Address pThisCNDPlayerBot, DHookReturn hRet
     return MRES_Ignored;
 }
 
-MRESReturn Detour_TeamMayCapturePoint(DHookReturn hReturn, DHookParam hParams)
+MRESReturn Detour_PlayerMayCapturePoint(DHookReturn hReturn, DHookParam hParams)
 {
-    //int iTeam = DHookGetParam(hParams, MAYCAPTURE_PARAM_TEAM);
-    Address pBaseResourcePoint = DHookGetParamAddress(hParams, MAYCAPTURE_PARAM_RESOURCE_POINT);
-    int iEntity = SDKCall(g_hSDKCall_GetEntity, pBaseResourcePoint);
-
-    // determine if we're primary, secondary, or tertiary
-    eNDResourcePoint eResourcePoint = eNDPoint_Primary;
-    if (IsValidEntity(iEntity))
+    int iReturn = DHookGetReturn(hReturn);
+    // if we're already not capturable then we can skip the rest
+    if (iReturn)
     {
-        eResourcePoint = view_as<eNDResourcePoint>(GetEntProp(iEntity, Prop_Send, "m_iNetResourcePointType", 4));
-    }
+        Address pPlayer = DHookGetParamAddress(hParams, PLAYER_MAY_CAP_PARAM_CNDPLAYER);
+        int iPlayer = SDKCall(g_hSDKCall_GetEntity, pPlayer);
 
-    if (eResourcePoint != eNDPoint_Primary)
-    {
-        DHookSetReturn(hReturn, false);
-        return MRES_Supercede;
+        Address pResourcePoint = DHookGetParamAddress(hParams, PLAYER_MAY_CAP_PARAM_RESOURCE_POINT);
+        int iResourcePoint = SDKCall(g_hSDKCall_GetEntity, pResourcePoint);
+
+        // determine if we're primary, secondary, or tertiary
+        eNDResourcePoint eResourcePoint = eNDPoint_Primary;
+        if (IsValidEntity(iResourcePoint))
+        {
+            eResourcePoint = view_as<eNDResourcePoint>(GetEntProp(iResourcePoint, Prop_Send, "m_iNetResourcePointType", 4));
+        }
+
+        if (eResourcePoint != eNDPoint_Primary)
+        {
+            DHookSetReturn(hReturn, false);
+
+            // give a reminder to humans
+            if (!IsFakeClient(iPlayer))
+            {
+                PrintToChat(iPlayer, "Only the Primary point can be captured on King of the Hill.");
+            }
+            return MRES_Supercede;
+        }
     }
 
     return MRES_Ignored;
