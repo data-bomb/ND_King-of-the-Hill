@@ -31,6 +31,9 @@ The team who controls Prime for the longest amount of time will win the round.
 - Limit nades for team defending prime
 - Reports score in HUD
 
+## Compilation / Dependencies:
+- Place `morecolors.inc` in addons/sourcemod/scripting/include [https://github.com/Bara/Multi-Colors]
+
 ## Future Considerations:
 - Add colored chat messages
 - Add reminders of King of the Hill mode
