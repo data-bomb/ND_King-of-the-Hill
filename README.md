@@ -25,7 +25,7 @@ The team who controls Prime for the longest amount of time will win the round.
 ### Miscellaneous Changes
 - Reports score in HUD
 
-## Installation:
+## Installation Steps:
 - Install the `[ND] Commander Structure Intercepts` plugin (https://forums.alliedmods.net/showthread.php?p=2796149)
 - Ensure the `build-structure.games.txt` file is in the addons/sourcemod/gamedata/ directory
 - Copy the `nd_king_of_the_hill.smx` file to the addons/sourcemod/plugins/ directory
@@ -36,11 +36,11 @@ The team who controls Prime for the longest amount of time will win the round.
 - (Optional) Add `mp_maxrounds 4` to the cfg/server.cfg file
 - (Optional) Add `sv_tags "kingofthehill"` to the cfg/server.cfg file
 
-## Compilation / Dependencies:
+## Compilation Dependencies:
 - Place `morecolors.inc` in addons/sourcemod/scripting/include [https://github.com/Bara/Multi-Colors]
 
 ## Future Considerations:
 - Add colored chat messages
-- Add reminders of King of the Hill mode
+- Add more reminders of King of the Hill mode
 - Add translations support
 - Improve balance
