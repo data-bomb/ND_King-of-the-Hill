@@ -347,7 +347,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.23"
+#define PLUGIN_VERSION "1.0.24"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -356,6 +356,7 @@ int g_iKingOfTheHillTeam = 0;
 bool g_bInCommanderChair[MAXPLAYERS+1];
 int g_iScore[2] = {0, 0};
 int g_iTeamEntity[2] = {-1, -1};
+int g_iBunkerEntity[2] = {-1, -1};
 int g_iPrimaryPointEntity = INVALID_ENTITY;
 Handle g_hSDKCall_ReceiveResources = INVALID_HANDLE;
 Handle g_hSDKCall_SpendResources = INVALID_HANDLE;
@@ -575,14 +576,14 @@ public void OnPluginStart()
 
 }
 
-void KingOfTheHill_EndRound()
+void KingOfTheHill_EndRound(bool bClinched = false)
 {
     // determine winner
     if (g_iScore[TEAM_CONSORT-2] == g_iScore[TEAM_EMPIRE-2])
     {
         // stalemate
         SDKCall(g_hSDKCall_SetRoundWinner, 0, view_as<int>(eNDRoundEnd_Stalemate));
-        
+
         #if defined DEBUG
         PrintToServer("Terminate Round as Stalemate with Empire %d and Consort %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
         #endif
@@ -590,12 +591,26 @@ void KingOfTheHill_EndRound()
     else
     {
         int iWinningTeam = (g_iScore[TEAM_CONSORT-2] > g_iScore[TEAM_EMPIRE-2] ? TEAM_CONSORT : TEAM_EMPIRE);
-        // other team "eliminated"
-        SDKCall(g_hSDKCall_SetRoundWinner, iWinningTeam, view_as<int>(eNDRoundEnd_Eliminated));
 
-        #if defined DEBUG
-        PrintToServer("Terminate Round as Eliminated with Empire %d and Consort %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
-        #endif
+        if (bClinched)
+        {
+            // other team "eliminated"
+            SDKCall(g_hSDKCall_SetRoundWinner, iWinningTeam, view_as<int>(eNDRoundEnd_Eliminated));
+
+            #if defined DEBUG
+            PrintToServer("Terminate Round as Eliminated with Empire %d and Consort %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
+            #endif
+        }
+        else
+        {
+            // bunker destroyed
+            int iBunkerToDestroy = (iWinningTeam == TEAM_CONSORT ? g_iBunkerEntity[TEAM_EMPIRE-2] : g_iBunkerEntity[TEAM_CONSORT-2]);
+            SDKHooks_TakeDamage(iBunkerToDestroy, 0, 0, 99999.0, DMG_GENERIC, -1, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, true);
+
+            #if defined DEBUG
+            PrintToServer("Terminate Round as Bunker Destroyed with Empire %d and Consort %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
+            #endif
+        }
     }
 }
 
@@ -724,8 +739,39 @@ public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcas
     g_bGameStarted = false;
     g_iKingOfTheHillTeam = 0;
 
-    CPrintToChatAll("\x05[Consortium Score] %d", g_iScore[TEAM_CONSORT-2]);
-    CPrintToChatAll("\x05       [Empire Score] %d", g_iScore[TEAM_EMPIRE-2]);
+    // publish scores
+    CPrintToChatAll("{default}[{red}Consortium Score{default}] {lightgreen}%d", g_iScore[TEAM_CONSORT-2]);
+    CPrintToChatAll("{default}       [{blue}Empire Score{default}] {lightgreen}%d", g_iScore[TEAM_EMPIRE-2]);
+
+    int iWinningTeam = event.GetInt("team");
+    eNDRoundEndReason eReason = view_as<eNDRoundEndReason>(event.GetInt("type"));
+
+    if (iWinningTeam == TEAM_CONSORT)
+    {
+        if (eReason == eNDRoundEnd_Eliminated)
+        {
+            CPrintToChatAll(" {red}Consortium Clinched Win");
+        }
+        else
+        {
+            CPrintToChatAll("        {red}Consortium Victorius");
+        }
+    }
+    else if (iWinningTeam == TEAM_EMPIRE)
+    {
+        if (eReason == eNDRoundEnd_Eliminated)
+        {
+            CPrintToChatAll(" {blue}Empire Clinched Win");
+        }
+        else
+        {
+            CPrintToChatAll("        {blue}Empire Victorius");
+        }
+    }
+    else
+    {
+        CPrintToChatAll("        {green}STALEMATE");
+    }
 
     return Plugin_Continue;
 }
@@ -757,6 +803,7 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
     if (g_hTimer_TerminateRound != INVALID_HANDLE)
     {
         CloseHandle(g_hTimer_TerminateRound);
+        g_hTimer_TerminateRound = INVALID_HANDLE;
     }
 
     // determine when to end the round
@@ -1138,7 +1185,13 @@ public Action Timer_UpdateScore(Handle hTimer, any iClinchTime)
     // evaluate if either team has clinched victory
     if (g_iScore[TEAM_CONSORT-2] >= iClinchTime || g_iScore[TEAM_EMPIRE-2] >= iClinchTime)
     {
-        KingOfTheHill_EndRound();
+        if (g_hTimer_TerminateRound != INVALID_HANDLE)
+        {
+            CloseHandle(g_hTimer_TerminateRound);
+            g_hTimer_TerminateRound = INVALID_HANDLE;
+        }
+
+        KingOfTheHill_EndRound(true);
         return Plugin_Stop;
     }
 
@@ -1204,10 +1257,12 @@ stock void ND_FindMapEntities()
                 if (iTeamNum == TEAM_EMPIRE)
                 {
                     GetEntPropVector(iEntityIndex, Prop_Data, "m_vecOrigin", g_fBunkerEmpirePosition);
+                    g_iBunkerEntity[TEAM_EMPIRE-2] = iEntityIndex;
                 }
                 else if (iTeamNum == TEAM_CONSORT)
                 {
                     GetEntPropVector(iEntityIndex, Prop_Data, "m_vecOrigin", g_fBunkerConsortPosition);
+                    g_iBunkerEntity[TEAM_CONSORT-2] = iEntityIndex;
                 }
             }
         }
