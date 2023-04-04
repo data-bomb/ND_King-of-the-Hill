@@ -16,6 +16,11 @@
                 "linux"     "@_ZN12CNDPlayerBot28SelectResourcePointToCaptureEP10CUtlVectorIP20CNDBaseResourcePoint10CUtlMemoryIS2_iEE"
                 "windows"   "\x55\x8B\xEC\x83\xEC\x0C\x53\x57\x8B\x7D\x2A\x8B\xD9\x89\x5D"
             }
+            "CNuclearDawn::PlayerMayCapturePoint"
+            {
+                "library"   "server"
+                "linux"     "@_ZN12CNuclearDawn21PlayerMayCapturePointEP9CNDPlayerP20CNDBaseResourcePoint"
+            }
             "CNuclearDawn::ReceiveResources"
             {
                 "library"   "server"
@@ -62,6 +67,27 @@
                     "position"
                     {
                         "type"  "vectorptr"
+                    }
+                }
+            }
+            "CNuclearDawn::PlayerMayCapturePoint"
+            {
+                "signature" "CNuclearDawn::PlayerMayCapturePoint"
+                "callconv"  "cdecl"
+                "return"    "bool"
+                "arguments"
+                {
+                    "gamerules"
+                    {
+                        "type"  "objectptr"
+                    }
+                    "player"
+                    {
+                        "type"  "objectptr"
+                    }
+                    "resourcepoint"
+                    {
+                        "type"  "objectptr"
                     }
                 }
             }
