@@ -6,21 +6,24 @@ A SourceMod gamemode plugin for Nuclear Dawn.
 Teams fight over control of the Primary Resource Point in timed round matches.
 The team who controls Prime for the longest amount of time will win the round.
 
-## Gameplay Features:
-- Turns off all tertiary and secondary resource resource points
-- Increases trickle income from 1,200/minute to 3,600/minute
-- No offensive buildings within 1,300 distance of primary resource point
+## Gameplay Features
+### Focus on Players Taking Prime
+- Tertiary and Secondary resource points may not be captured
+*(Bots will only try and capture and defend Prime)*
+- Stops offensive buildings within 1,300 distance of primary resource point
 *(No spawns, turrets, artillery, or walls)*
-- No artillery shelling within 900 distance of primary resource point
-- No commander abilities within 900 distance of primary resource point
-- No building on the enemy side of the map
-- Make starting map structures invulnerable to sieging
-- Make new structures harder to destroy
-- Force bots to capture/defend main point only
+- Stops artillery shelling within 900 distance of primary resource point
+- Stops commander abilities within 900 distance of primary resource point
+- Stops all building on the enemy side of the map
+- Starting structures are invulnerable
+### Economy Changes
+- Increases trickle income from 1,200/minute to 3,600/minute
+- Earn 500 resources for each kill when attacking Prime
+### Balance Changes
+- Make new structures slightly harder to destroy
 - Limit nades for team defending prime
+### Miscellaneous Changes
 - Reports score in HUD
-
-
 
 ## Installation:
 - Install the `[ND] Commander Structure Intercepts` plugin (https://forums.alliedmods.net/showthread.php?p=2796149)
