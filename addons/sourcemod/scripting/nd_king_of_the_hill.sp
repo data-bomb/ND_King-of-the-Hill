@@ -347,12 +347,14 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.24"
+#define PLUGIN_VERSION "1.0.26"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
 bool g_bGameStarted = false;
 int g_iKingOfTheHillTeam = 0;
+bool g_bCaptureReminderTertiary[MAXPLAYERS+1];
+bool g_bCaptureReminderSecondary[MAXPLAYERS+1];
 bool g_bInCommanderChair[MAXPLAYERS+1];
 int g_iScore[2] = {0, 0};
 int g_iTeamEntity[2] = {-1, -1};
@@ -776,6 +778,12 @@ public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcas
     return Plugin_Continue;
 }
 
+public OnClientPutInServer(int iPlayer)
+{
+    g_bCaptureReminderSecondary[iPlayer] = false;
+    g_bCaptureReminderTertiary[iPlayer] = false;
+}
+
 public OnConfigsExecuted()
 {
     // check for an invalid round time and provides default 15 min roundtime
@@ -1019,7 +1027,14 @@ MRESReturn Detour_PlayerMayCapturePoint(DHookReturn hReturn, DHookParam hParams)
             // give a reminder to humans
             if (!IsFakeClient(iPlayer))
             {
-                PrintToChat(iPlayer, "Only the Primary point can be captured on King of the Hill.");
+                if (eResourcePoint == eNDPoint_Secondary && !g_bCaptureReminderSecondary[iPlayer])
+                {
+                    PrintToChat(iPlayer, "Only the Primary point can be captured on King of the Hill.");
+                }
+                else if (eResourcePoint == eNDPoint_Tertiary && !g_bCaptureReminderTertiary[iPlayer])
+                {
+                    PrintToChat(iPlayer, "Only the Primary point can be captured on King of the Hill.");
+                }
             }
             return MRES_Supercede;
         }
