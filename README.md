@@ -41,5 +41,5 @@ The team who controls Prime for the longest amount of time will win the round.
 ## Future Considerations:
 - Add colored chat messages
 - Add more reminders of King of the Hill mode
-- Add translations support
+- Complete translations support
 - Improve balance
