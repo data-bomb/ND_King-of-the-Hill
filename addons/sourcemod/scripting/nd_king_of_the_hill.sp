@@ -347,7 +347,25 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_CNDPLAYER          1
 #define RUNABILITY_PARAM_ORIGIN             2
 
-#define PLUGIN_VERSION "1.0.26"
+#define CHAT_PREFIX_GLOBAL                  "[KotH] %T"
+#define CHAT_PREFIX                         "[KotH] %t"
+#define STRUCTURE_DEPENDENCY                "nd_structure_intercept"
+#define GAMEDATA_RESOURCE_POINTS            "resource-points.games"
+#define GAMEDATA_COMMANDER_ABILITIES        "commander-abilities.games"
+#define GAMEDATA_TERMINATE_ROUND            "terminate-round.games"
+#define USERMESSAGE_RECEIVE_RESOURCES       "RecieveResources"
+#define SIGNATURE_PLAYER_MAY_CAP_RESOURCE   "CNuclearDawn::PlayerMayCapturePoint"
+#define SIGNATURE_SELECT_RESOURCE_TO_CAP    "CNDPlayerBot::SelectResourcePointToCapture"
+#define SIGNATURE_SELECT_RESOURCE_TO_DEFEND "CNDPlayerBot::SelectResourcePointToDefend"
+#define SIGNATURE_DAMAGE_RUN_ABILITY        "CNDCommanderDamageAbility::RunAbility"
+#define SIGNATURE_HEAL_RUN_ABILITY          "CNDCommanderHealAbility::RunAbility"
+#define SIGNATURE_HINDER_RUN_ABILITY        "CNDCommanderHinderAbility::RunAbility"
+#define SIGNATURE_FIRE_ARTILLERY            "CNDBaseArtillery::FireAtPosition"
+#define SIGNATURE_RECEIVE_RESOURCES         "CNuclearDawn::ReceiveResources"
+#define SIGNATURE_SPEND_RESOURCES           "CNuclearDawn::SpendResources"
+#define SIGNATURE_SET_ROUND_WIN             "CNuclearDawn::SetRoundWin"
+
+#define PLUGIN_VERSION "1.0.27"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -392,9 +410,9 @@ public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iMax
 // check for dependency on nd_structure_intercept
 public void OnAllPluginsLoaded()
 {
-    if (!LibraryExists("nd_structure_intercept"))
+    if (!LibraryExists(STRUCTURE_DEPENDENCY))
     {
-        SetFailState("Failed to find plugin dependency nd_structure_intercept");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Plugin Dependency", LANG_SERVER, STRUCTURE_DEPENDENCY);
     }
 }
 
@@ -402,76 +420,78 @@ public void OnPluginStart()
 {
     CreateConVar("nd_koth_version", PLUGIN_VERSION, "ND King of the Hill Version", FCVAR_SPONLY|FCVAR_DONTRECORD|FCVAR_REPLICATED|FCVAR_NOTIFY);
 
-    GameData hGameDataResource = new GameData("resource-points.games");
+    LoadTranslations("kingofthehill.phrases");
+
+    GameData hGameDataResource = new GameData(GAMEDATA_RESOURCE_POINTS);
     if (!hGameDataResource)
     {
-        SetFailState("Failed to find gamedata/resource-points.games.txt");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Gamedata File", LANG_SERVER, GAMEDATA_RESOURCE_POINTS);
     }
 
-    DynamicDetour detourPlayerCapturePoint = DynamicDetour.FromConf(hGameDataResource, "CNuclearDawn::PlayerMayCapturePoint");
+    DynamicDetour detourPlayerCapturePoint = DynamicDetour.FromConf(hGameDataResource, SIGNATURE_PLAYER_MAY_CAP_RESOURCE);
     if (!detourPlayerCapturePoint)
     {
-        SetFailState("Failed to find signature CNuclearDawn::PlayerMayCapturePoint");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_PLAYER_MAY_CAP_RESOURCE);
     }
 
     detourPlayerCapturePoint.Enable(Hook_Post, Detour_PlayerMayCapturePoint);
     delete detourPlayerCapturePoint;
 
-    DynamicDetour detourSelectPointToCapture = DynamicDetour.FromConf(hGameDataResource, "CNDPlayerBot::SelectResourcePointToCapture");
+    DynamicDetour detourSelectPointToCapture = DynamicDetour.FromConf(hGameDataResource, SIGNATURE_SELECT_RESOURCE_TO_CAP);
     if (!detourSelectPointToCapture)
     {
-        SetFailState("Failed to find signature CNDPlayerBot::SelectResourcePointToCapture");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_SELECT_RESOURCE_TO_CAP);
     }
 
     detourSelectPointToCapture.Enable(Hook_Post, Detour_SelectCapturePoint);
     delete detourSelectPointToCapture;
 
-    DynamicDetour detourSelectPointToDefend = DynamicDetour.FromConf(hGameDataResource, "CNDPlayerBot::SelectResourcePointToDefend");
+    DynamicDetour detourSelectPointToDefend = DynamicDetour.FromConf(hGameDataResource, SIGNATURE_SELECT_RESOURCE_TO_DEFEND);
     if (!detourSelectPointToDefend)
     {
-        SetFailState("Failed to find signature CNDPlayerBot::SelectResourcePointToDefend");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_SELECT_RESOURCE_TO_DEFEND);
     }
 
     detourSelectPointToDefend.Enable(Hook_Post, Detour_SelectDefensePoint);
     delete detourSelectPointToDefend;
 
-    GameData hGameDataAbilities = new GameData("commander-abilities.games");
+    GameData hGameDataAbilities = new GameData(GAMEDATA_COMMANDER_ABILITIES);
     if (!hGameDataAbilities)
     {
-        SetFailState("Failed to find gamedata/commander-abilities.games.txt");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Gamedata File", LANG_SERVER, GAMEDATA_COMMANDER_ABILITIES);
     }
 
-    DynamicDetour detourRunDamageAbility = DynamicDetour.FromConf(hGameDataAbilities, "CNDCommanderDamageAbility::RunAbility");
+    DynamicDetour detourRunDamageAbility = DynamicDetour.FromConf(hGameDataAbilities, SIGNATURE_DAMAGE_RUN_ABILITY);
     if (!detourRunDamageAbility)
     {
-        SetFailState("Failed to find signature CNDCommanderDamageAbility::RunAbility");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_DAMAGE_RUN_ABILITY);
     }
 
     detourRunDamageAbility.Enable(Hook_Pre, Detour_RunCommanderAbility);
     delete detourRunDamageAbility;
 
-    DynamicDetour detourRunHealAbility = DynamicDetour.FromConf(hGameDataAbilities, "CNDCommanderHealAbility::RunAbility");
+    DynamicDetour detourRunHealAbility = DynamicDetour.FromConf(hGameDataAbilities, SIGNATURE_HEAL_RUN_ABILITY);
     if (!detourRunHealAbility)
     {
-        SetFailState("Failed to find signature CNDCommanderHealAbility::RunAbility");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_HEAL_RUN_ABILITY);
     }
 
     detourRunHealAbility.Enable(Hook_Pre, Detour_RunCommanderAbility);
     delete detourRunHealAbility;
 
-    DynamicDetour detourRunHinderAbility = DynamicDetour.FromConf(hGameDataAbilities, "CNDCommanderHinderAbility::RunAbility");
+    DynamicDetour detourRunHinderAbility = DynamicDetour.FromConf(hGameDataAbilities, SIGNATURE_HINDER_RUN_ABILITY);
     if (!detourRunHinderAbility)
     {
-        SetFailState("Failed to find signature CNDCommanderHinderAbility::RunAbility");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_HINDER_RUN_ABILITY);
     }
 
     detourRunHinderAbility.Enable(Hook_Pre, Detour_RunCommanderAbility);
     delete detourRunHinderAbility;
 
-    DynamicDetour detourFireArtillery = DynamicDetour.FromConf(hGameDataAbilities, "CNDBaseArtillery::FireAtPosition");
+    DynamicDetour detourFireArtillery = DynamicDetour.FromConf(hGameDataAbilities, SIGNATURE_FIRE_ARTILLERY);
     if (!detourFireArtillery)
     {
-        SetFailState("Failed to find signature CNDBaseArtillery::FireAtPosition");
+       SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_FIRE_ARTILLERY);
     }
 
     detourFireArtillery.Enable(Hook_Pre, Detour_FireArtilleryAtPosition);
@@ -479,10 +499,10 @@ public void OnPluginStart()
 
     // prep a call to give a team resources
     StartPrepSDKCall(SDKCall_GameRules);
-    bool bSuccess = PrepSDKCall_SetFromConf(hGameDataResource, SDKConf_Signature, "CNuclearDawn::ReceiveResources");
+    bool bSuccess = PrepSDKCall_SetFromConf(hGameDataResource, SDKConf_Signature, SIGNATURE_RECEIVE_RESOURCES);
     if (!bSuccess)
     {
-        SetFailState("Failed to find signature CNuclearDawn::ReceiveResources");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_RECEIVE_RESOURCES);
     }
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
@@ -491,15 +511,15 @@ public void OnPluginStart()
 
     if (!g_hSDKCall_ReceiveResources)
     {
-        SetFailState("Failed to establish SDKCall for CNuclearDawn::ReceiveResources");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail SDKCall", LANG_SERVER, SIGNATURE_RECEIVE_RESOURCES);
     }
 
     // prep a call to take resources away
     StartPrepSDKCall(SDKCall_GameRules);
-    bSuccess = PrepSDKCall_SetFromConf(hGameDataResource, SDKConf_Signature, "CNuclearDawn::SpendResources");
+    bSuccess = PrepSDKCall_SetFromConf(hGameDataResource, SDKConf_Signature, SIGNATURE_SPEND_RESOURCES);
     if (!bSuccess)
     {
-        SetFailState("Failed to find signature CNuclearDawn::SpendResources");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_SPEND_RESOURCES);
     }
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
@@ -508,21 +528,21 @@ public void OnPluginStart()
 
     if (!g_hSDKCall_SpendResources)
     {
-        SetFailState("Failed to establish SDKCall for CNuclearDawn::SpendResources");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail SDKCall", LANG_SERVER, SIGNATURE_SPEND_RESOURCES);
     }
 
-    GameData hTerminateRound = new GameData("terminate-round.games");
+    GameData hTerminateRound = new GameData(GAMEDATA_TERMINATE_ROUND);
     if (!hTerminateRound)
     {
-        SetFailState("Failed to find gamedata/terminate-round.games.txt");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Gamedata File", LANG_SERVER, GAMEDATA_TERMINATE_ROUND);
     }
 
     // prep a call to set the winner and end the round
     StartPrepSDKCall(SDKCall_GameRules);
-    bSuccess = PrepSDKCall_SetFromConf(hTerminateRound, SDKConf_Signature, "CNuclearDawn::SetRoundWin");
+    bSuccess = PrepSDKCall_SetFromConf(hTerminateRound, SDKConf_Signature, SIGNATURE_SET_ROUND_WIN);
     if (!bSuccess)
     {
-        SetFailState("Failed to find signature CNuclearDawn::SetRoundWin");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail Signature Check", LANG_SERVER, SIGNATURE_SET_ROUND_WIN);
     }
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
@@ -530,17 +550,17 @@ public void OnPluginStart()
 
     if (!g_hSDKCall_SetRoundWinner)
     {
-        SetFailState("Failed to establish SDKCall for CNuclearDawn::SetRoundWin");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail SDKCall", LANG_SERVER, SIGNATURE_SET_ROUND_WIN);
     }
 
     delete hGameDataAbilities;
     delete hGameDataResource;
     delete hTerminateRound;
 
-    UserMsg hReceiveMessage = GetUserMessageId("RecieveResources");
+    UserMsg hReceiveMessage = GetUserMessageId(USERMESSAGE_RECEIVE_RESOURCES);
     if (hReceiveMessage == INVALID_MESSAGE_ID)
     {
-        SetFailState("Failed to find user message RecieveResources");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail User Message", LANG_SERVER, USERMESSAGE_RECEIVE_RESOURCES);
     }
 
     HookUserMessage(hReceiveMessage, MessageHook_RecieveResources);
@@ -553,14 +573,10 @@ public void OnPluginStart()
 
     if (!g_hSDKCall_GetEntity)
     {
-        SetFailState("Failed to establish SDKCall for x::GetEntity");
+        SetFailState(CHAT_PREFIX_GLOBAL, "Fail SDKCall", LANG_SERVER, "GetEntity");
     }
 
     g_cRoundTime = FindConVar("mp_roundtime");
-    if (!g_cRoundTime)
-    {
-        SetFailState("Unable to find mp_roundtime");
-    }
 
     HookEvent("round_start", Event_RoundStart, EventHookMode_Post);
     HookEvent("resource_captured", Event_ResourceCaptured, EventHookMode_Post);
