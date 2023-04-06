@@ -1,0 +1,28 @@
+"Phrases"
+{
+    "Fail Plugin Dependency"
+    {
+        "#format"   "{1:s}"
+        "en"        "Failed to find plugin: {1}"
+    }
+    "Fail Gamedata File"
+    {
+        "#format"   "{1:s}"
+        "en"        "Failed to find file: gamedata/{1}.txt"
+    }
+    "Fail Signature Check"
+    {
+        "#format"   "{1:s}"
+        "en"        "Failed to find signature for {1}"
+    }
+    "Fail SDKCall"
+    {
+        "#format"   "{1:s}"
+        "en"        "Failed to establish SDKCall for {1}"
+    }
+    "Fail User Message"
+    {
+        "#format"   "{1:s}"
+        "en"        "Failed to find user message for {1}"
+    }
+}
