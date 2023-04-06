@@ -26,6 +26,7 @@ The team who controls Prime for the longest amount of time will win the round.
 ## Installation Steps:
 - Install the `[ND] Commander Structure Intercepts` plugin (https://forums.alliedmods.net/showthread.php?p=2796149)
 - Ensure the `build-structure.games.txt` file is in the addons/sourcemod/gamedata/ directory
+- Copy the `kingofthehill.phrases.txt` file to the addons/sourcemod/translations directory
 - Copy the `nd_king_of_the_hill.smx` file to the addons/sourcemod/plugins/ directory
 - Copy the `commander-abilities.games.txt` file to the addons/sourcemod/gamedata/ directory
 - Copy the `resource-points.games.txt` file to the addons/sourcemod/gamedata/ directory
