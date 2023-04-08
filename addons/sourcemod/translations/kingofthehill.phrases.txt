@@ -1,10 +1,69 @@
 "Phrases"
 {
-    "Fail Plugin Dependency"
+    "Player Reminder Primary Point"
     {
-        "#format"   "{1:s}"
-        "en"        "Failed to find plugin: {1}"
+        "en"        "Only the Primary point can be captured on King of the Hill."
     }
+    "Commander Build Failure Enemy Side"
+    {
+        "en"        "NO BUILDING ON ENEMY SIDE OF MAP."
+    }
+    "Commander Build Failure Prime"
+    {
+        "en"        "NO OFFENSIVE BLDGS NEAR PRIMARY POINT."
+    }
+    "Player Artillery Near Prime"
+    {
+        "en"        "Cannot call artillery that close to Primary Resource Point."
+    }
+    "Commander Artillery Near Prime"
+    {
+        "en"        "STRIKE TOO CLOSE TO PRIMARY POINT."
+    }
+    "Commander Ability Near Prime"
+    {
+        "en"        "ABILITY TOO CLOSE TO PRIMARY POINT."
+    }
+    "Endgame Consortium Win Clinched"
+    {
+        "en"        " {red}Consortium Clinched Win"
+    }
+    "Endgame Consortium Win Timed"
+    {
+        "en"        "        {red}Consortium Victorius"
+    }
+    "Endgame Empire Win Clinched"
+    {
+        "en"        " {blue}Empire Clinched Win"
+    }
+    "Endgame Empire Win Timed"
+    {
+        "en"        "        {blue}Empire Victorius"
+    }
+    "Endgame Stalemate"
+    {
+        "en"        "        {green}Stalemate"
+    }
+    "Midgame Hud Score"
+    {
+        "#format"   "{1:d},{2:d}"
+        "en"        "Empire         {1}\nConsortium  {2}"
+    }
+    "Endgame Consortium Score"
+    {
+        "#format"   "{1:d}"
+        "en"        "{default}[{red}Consortium Score{default}] {lightgreen}{1}"
+    }
+    "Endgame Empire Score"
+    {
+        "#format"   "{1:d}"
+        "en"        "{default}       [{blue}Empire Score{default}] {lightgreen}{1}"
+    }
+	"Fail Plugin Dependency"
+	{
+        "#format"	"{1:s}"
+		"en"		"Failed to find plugin: {1}"
+	}
     "Fail Gamedata File"
     {
         "#format"   "{1:s}"
