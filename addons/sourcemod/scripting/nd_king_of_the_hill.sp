@@ -365,7 +365,7 @@ enum eNDRoundEndReason
 #define SIGNATURE_SPEND_RESOURCES           "CNuclearDawn::SpendResources"
 #define SIGNATURE_SET_ROUND_WIN             "CNuclearDawn::SetRoundWin"
 
-#define PLUGIN_VERSION "1.0.28"
+#define PLUGIN_VERSION "1.0.29"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -1046,10 +1046,12 @@ MRESReturn Detour_PlayerMayCapturePoint(DHookReturn hReturn, DHookParam hParams)
                 if (eResourcePoint == eNDPoint_Secondary && !g_bCaptureReminderSecondary[iPlayer])
                 {
                     PrintToChat(iPlayer, CHAT_PREFIX, "Player Reminder Primary Point");
+                    g_bCaptureReminderSecondary[iPlayer] = true;
                 }
                 else if (eResourcePoint == eNDPoint_Tertiary && !g_bCaptureReminderTertiary[iPlayer])
                 {
                     PrintToChat(iPlayer, CHAT_PREFIX, "Player Reminder Primary Point");
+                    g_bCaptureReminderTertiary[iPlayer] = true;
                 }
             }
             return MRES_Supercede;
