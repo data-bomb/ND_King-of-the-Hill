@@ -365,7 +365,7 @@ enum eNDRoundEndReason
 #define SIGNATURE_SPEND_RESOURCES           "CNuclearDawn::SpendResources"
 #define SIGNATURE_SET_ROUND_WIN             "CNuclearDawn::SetRoundWin"
 
-#define PLUGIN_VERSION "1.0.27"
+#define PLUGIN_VERSION "1.0.28"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -758,8 +758,8 @@ public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcas
     g_iKingOfTheHillTeam = 0;
 
     // publish scores
-    CPrintToChatAll("{default}[{red}Consortium Score{default}] {lightgreen}%d", g_iScore[TEAM_CONSORT-2]);
-    CPrintToChatAll("{default}       [{blue}Empire Score{default}] {lightgreen}%d", g_iScore[TEAM_EMPIRE-2]);
+    CPrintToChatAll(CHAT_PREFIX, "Endgame Consortium Score", g_iScore[TEAM_CONSORT-2]);
+    CPrintToChatAll(CHAT_PREFIX, "Endgame Empire Score", g_iScore[TEAM_EMPIRE-2]);
 
     int iWinningTeam = event.GetInt("team");
     eNDRoundEndReason eReason = view_as<eNDRoundEndReason>(event.GetInt("type"));
@@ -768,27 +768,27 @@ public Action Event_RoundWin(Event event, const char[] sName, bool bDontBroadcas
     {
         if (eReason == eNDRoundEnd_Eliminated)
         {
-            CPrintToChatAll(" {red}Consortium Clinched Win");
+            CPrintToChatAll(CHAT_PREFIX, "Endgame Consortium Win Clinched");
         }
         else
         {
-            CPrintToChatAll("        {red}Consortium Victorius");
+            CPrintToChatAll(CHAT_PREFIX, "Endgame Consortium Win Timed");
         }
     }
     else if (iWinningTeam == TEAM_EMPIRE)
     {
         if (eReason == eNDRoundEnd_Eliminated)
         {
-            CPrintToChatAll(" {blue}Empire Clinched Win");
+            CPrintToChatAll(CHAT_PREFIX, "Endgame Empire Win Clinched");
         }
         else
         {
-            CPrintToChatAll("        {blue}Empire Victorius");
+            CPrintToChatAll(CHAT_PREFIX, "Endgame Empire Win Timed");
         }
     }
     else
     {
-        CPrintToChatAll("        {green}STALEMATE");
+        CPrintToChatAll(CHAT_PREFIX, "Endgame Stalemate");
     }
 
     return Plugin_Continue;
@@ -947,7 +947,7 @@ public Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, flo
 
     if (iTeam == TEAM_EMPIRE && fDistanceToEmpireBunker > fDistanceToConsortBunker)
     {
-        UTIL_Commander_FailureText(client, "BUILDING TOO CLOSE TO ENEMY BUNKER.");
+        UTIL_Commander_FailureText(client, "NO BUILDING ON ENEMY SIDE OF MAP.");
 
         #if defined DEBUG
         PrintToServer("blocked empire building %d too far away from bunker", structure);
@@ -957,7 +957,7 @@ public Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, flo
     }
     else if (iTeam == TEAM_CONSORT && fDistanceToConsortBunker > fDistanceToEmpireBunker)
     {
-        UTIL_Commander_FailureText(client, "BUILDING TOO CLOSE TO ENEMY BUNKER.");
+        UTIL_Commander_FailureText(client, "NO BUILDING ON ENEMY SIDE OF MAP.");
 
         #if defined DEBUG
         PrintToServer("blocked consort building %d too far away from bunker", structure);
@@ -1045,11 +1045,11 @@ MRESReturn Detour_PlayerMayCapturePoint(DHookReturn hReturn, DHookParam hParams)
             {
                 if (eResourcePoint == eNDPoint_Secondary && !g_bCaptureReminderSecondary[iPlayer])
                 {
-                    PrintToChat(iPlayer, "Only the Primary point can be captured on King of the Hill.");
+                    PrintToChat(iPlayer, CHAT_PREFIX, "Player Reminder Primary Point");
                 }
                 else if (eResourcePoint == eNDPoint_Tertiary && !g_bCaptureReminderTertiary[iPlayer])
                 {
-                    PrintToChat(iPlayer, "Only the Primary point can be captured on King of the Hill.");
+                    PrintToChat(iPlayer, CHAT_PREFIX, "Player Reminder Primary Point");
                 }
             }
             return MRES_Supercede;
@@ -1093,7 +1093,7 @@ MRESReturn Detour_FireArtilleryAtPosition(DHookParam hParams)
             }
             else
             {
-                PrintToChat(iPlayer, "[ND] Cannot call artillery that close to primary point.");
+                PrintToChat(iPlayer, CHAT_PREFIX, "Player Artillery Near Prime");
             }
         }
 
@@ -1250,7 +1250,7 @@ stock void DisplayScoreOnHud()
             // skip commanders sitting in chairs
             if (!g_bInCommanderChair[iClient])
             {
-                ShowSyncHudText(iClient, hHudScoreText, "Empire         %d\nConsortium  %d", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
+                ShowSyncHudText(iClient, hHudScoreText, "%t", "Midgame Hud Score", g_iScore[TEAM_EMPIRE-2], g_iScore[TEAM_CONSORT-2]);
             }
         }
     }
