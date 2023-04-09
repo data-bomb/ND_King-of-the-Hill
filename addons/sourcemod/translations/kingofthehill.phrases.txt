@@ -3,85 +3,104 @@
     "Player Reminder Primary Point"
     {
         "en"        "Only the Primary point can be captured on King of the Hill."
+        "ru"        "Только основную точку можно захватить на King of the Hill."
     }
     "Commander Build Failure Enemy Side"
     {
         "en"        "NO BUILDING ON ENEMY SIDE OF MAP."
+        "ru"        "НЕЛЬЗЯ СТРОИТЬ НА ВРАЖЕСКОЙ ТЕРРИТОРИИ."
     }
     "Commander Build Failure Prime"
     {
-        "en"        "NO OFFENSIVE BLDGS NEAR PRIMARY POINT."
+        "en"        "NO OFFENSIVE BUILDINGS NEAR PRIME."
+        "ru"        "НЕЛЬЗЯ АТАКУЮЩ. ЗДАНИЯ РЯДОМ С ОСН."
     }
     "Player Artillery Near Prime"
     {
         "en"        "Cannot call artillery that close to Primary Resource Point."
+        "ru"        "Нельзя вызвать артиллерию так близко к основной точке ресурсов."
     }
     "Commander Artillery Near Prime"
     {
         "en"        "STRIKE TOO CLOSE TO PRIMARY POINT."
+        "ru"        "СЛИШКОМ БЛИЗКО У ОСНОВНОЙ."
     }
     "Commander Ability Near Prime"
     {
         "en"        "ABILITY TOO CLOSE TO PRIMARY POINT."
+        "ru"        "СПОСОБНОСТЬ БЛИЗКО К ОСНОВНОЙ."
     }
     "Endgame Consortium Win Clinched"
     {
         "en"        " {red}Consortium Clinched Win"
+        "ru"        " {red}Консорциум одержал победу"
     }
     "Endgame Consortium Win Timed"
     {
         "en"        "        {red}Consortium Victorius"
+        "ru"        "        {red}Победа Консорциума"
     }
     "Endgame Empire Win Clinched"
     {
         "en"        " {blue}Empire Clinched Win"
+        "ru"        " {blue}Империя одержала победу"
     }
     "Endgame Empire Win Timed"
     {
         "en"        "        {blue}Empire Victorius"
+        "ru"        "        {blue}Империя победила"
     }
     "Endgame Stalemate"
     {
         "en"        "        {green}Stalemate"
+        "ru"        "        {green}Ничья"
     }
     "Midgame Hud Score"
     {
         "#format"   "{1:d},{2:d}"
         "en"        "Empire         {1}\nConsortium  {2}"
+        "ru"        "Империя       {1}\nКонсорциум  {2}"
     }
     "Endgame Consortium Score"
     {
         "#format"   "{1:d}"
         "en"        "{default}[{red}Consortium Score{default}] {lightgreen}{1}"
+        "ru"        "{default}[{red}Очки Консорциума{default}] {lightgreen}{1}"
     }
     "Endgame Empire Score"
     {
         "#format"   "{1:d}"
         "en"        "{default}       [{blue}Empire Score{default}] {lightgreen}{1}"
+        "ru"        "{default}       [{blue}Очки Империи{default}] {lightgreen}{1}"
     }
 	"Fail Plugin Dependency"
 	{
         "#format"	"{1:s}"
 		"en"		"Failed to find plugin: {1}"
+        "ru"        "Не удалось найти плагин: {1}"
 	}
     "Fail Gamedata File"
     {
         "#format"   "{1:s}"
         "en"        "Failed to find file: gamedata/{1}.txt"
+        "ru"        "Не удалось найти файл: gamedata/{1}.txt"
     }
     "Fail Signature Check"
     {
         "#format"   "{1:s}"
         "en"        "Failed to find signature for {1}"
+        "ru"        "ННе удалось найти подпись для {1}"
     }
     "Fail SDKCall"
     {
         "#format"   "{1:s}"
         "en"        "Failed to establish SDKCall for {1}"
+        "ru"        "Не удалось установить SDKCall для {1}"
     }
     "Fail User Message"
     {
         "#format"   "{1:s}"
-        "en"        "Failed to find user message for {1}"
+        "en"        "Failed to find UserMessage for {1}"
+        "ru"        "Не удалось найти UserMessage для {1}"
     }
 }
