@@ -23,7 +23,7 @@
 
 #include <multicolors>
 
-#tryinclude <nd_commander_build>
+//#tryinclude <nd_commander_build>
 #tryinclude <nd_structures>
 #tryinclude <nd_ammo>
 #tryinclude <nd_classes>
@@ -31,6 +31,7 @@
 #pragma semicolon 1
 
 //#define DEBUG 1
+#define PLUGIN_VERSION "1.0.30"
 
 #define RELAY_TOWER_COST        1750
 #define WIRELESS_REPEATER_COST  2000
@@ -103,6 +104,8 @@ enum eNDRoundEndReason
 
 #if !defined _nd_commmander_build_included_
 
+    #define MAX_COMMANDER_NOTICE_LENGTH     40
+
     /**
      * Allows a plugin to block a structure form being built by returning Plugin_Stop.
      *
@@ -114,13 +117,17 @@ enum eNDRoundEndReason
     forward Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, float position[3]);
 
     // This helper function will display red text and a failed sound to the commander
-    stock void UTIL_Commander_FailureText(int iClient, char sMessage[64])
+    stock void UTIL_Commander_FailureText(int iClient, const char[] sMessage, any ...)
     {
         ClientCommand(iClient, "play buttons/button7");
 
+        char sBuffer[MAX_COMMANDER_NOTICE_LENGTH];
+        SetGlobalTransTarget(iClient);
+        VFormat(sBuffer, MAX_COMMANDER_NOTICE_LENGTH, sMessage, 3);
+
         Handle hBfCommanderText;
         hBfCommanderText = StartMessageOne("CommanderNotice", iClient, USERMSG_BLOCKHOOKS);
-        BfWriteString(hBfCommanderText, sMessage);
+        BfWriteString(hBfCommanderText, sBuffer);
         EndMessage();
 
         // clear other messages from notice area
@@ -364,8 +371,6 @@ enum eNDRoundEndReason
 #define SIGNATURE_RECEIVE_RESOURCES         "CNuclearDawn::ReceiveResources"
 #define SIGNATURE_SPEND_RESOURCES           "CNuclearDawn::SpendResources"
 #define SIGNATURE_SET_ROUND_WIN             "CNuclearDawn::SetRoundWin"
-
-#define PLUGIN_VERSION "1.0.29"
 
 ConVar g_cRoundTime;
 bool g_bLateLoad = false;
@@ -923,7 +928,7 @@ public Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, flo
         // block all spawns, turrets, artillery, and walls near prime
         if (structure <= ND_Transport_Gate || structure == ND_Artillery || structure >= ND_FT_Turret)
         {
-            UTIL_Commander_FailureText(client, "NO OFFENSIVE BLDGS NEAR PRIMARY POINT.");
+            UTIL_Commander_FailureText(client, "%t", "Commander Build Failure Prime");
 
             #if defined DEBUG
             PrintToServer("blocked building %d too near primary point", structure);
@@ -947,7 +952,7 @@ public Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, flo
 
     if (iTeam == TEAM_EMPIRE && fDistanceToEmpireBunker > fDistanceToConsortBunker)
     {
-        UTIL_Commander_FailureText(client, "NO BUILDING ON ENEMY SIDE OF MAP.");
+        UTIL_Commander_FailureText(client, "%t", "Commander Build Failure Enemy Side");
 
         #if defined DEBUG
         PrintToServer("blocked empire building %d too far away from bunker", structure);
@@ -957,7 +962,7 @@ public Action ND_OnCommanderBuildStructure(client, ND_Structures &structure, flo
     }
     else if (iTeam == TEAM_CONSORT && fDistanceToConsortBunker > fDistanceToEmpireBunker)
     {
-        UTIL_Commander_FailureText(client, "NO BUILDING ON ENEMY SIDE OF MAP.");
+        UTIL_Commander_FailureText(client, "%t", "Commander Build Failure Enemy Side");
 
         #if defined DEBUG
         PrintToServer("blocked consort building %d too far away from bunker", structure);
@@ -1091,7 +1096,7 @@ MRESReturn Detour_FireArtilleryAtPosition(DHookParam hParams)
             MoveType eMoveType = GetEntityMoveType(iPlayer);
             if (bIsCommander && (eMoveType == MOVETYPE_ISOMETRIC))
             {
-                UTIL_Commander_FailureText(iPlayer, "STRIKE TOO CLOSE TO PRIMARY POINT.");
+                UTIL_Commander_FailureText(iPlayer, "%t", "Commander Artillery Near Prime");
             }
             else
             {
@@ -1126,7 +1131,7 @@ MRESReturn Detour_RunCommanderAbility(DHookParam hParams)
     if (fDistanceFromPrimaryPoint < MAX_ABILITY_DISTANCE_FROM_PRIMARY)
     {
         // communicate to only the commander
-        UTIL_Commander_FailureText(iPlayer, "ABILITY TOO CLOSE TO PRIMARY POINT.");
+        UTIL_Commander_FailureText(iPlayer, "%t", "Commander Ability Near Prime");
 
         // refund cost without corrupting resource/minute data
         int iTeam = GetClientTeam(iPlayer);
