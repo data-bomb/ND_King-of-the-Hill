@@ -31,7 +31,7 @@
 #pragma semicolon 1
 
 //#define DEBUG 1
-#define PLUGIN_VERSION "1.0.30"
+#define PLUGIN_VERSION "1.0.31"
 
 #define RELAY_TOWER_COST        1750
 #define WIRELESS_REPEATER_COST  2000
@@ -355,7 +355,7 @@ enum eNDRoundEndReason
 #define RUNABILITY_PARAM_ORIGIN             2
 
 #define CHAT_PREFIX_GLOBAL                  "[KotH] %T"
-#define CHAT_PREFIX                         "[KotH] %t"
+#define CHAT_PREFIX                         "{default}[{green}KotH{default}] %t"
 #define STRUCTURE_DEPENDENCY                "nd_structure_intercept"
 #define GAMEDATA_RESOURCE_POINTS            "resource-points.games"
 #define GAMEDATA_COMMANDER_ABILITIES        "commander-abilities.games"
@@ -1050,12 +1050,12 @@ MRESReturn Detour_PlayerMayCapturePoint(DHookReturn hReturn, DHookParam hParams)
             {
                 if (eResourcePoint == eNDPoint_Secondary && !g_bCaptureReminderSecondary[iPlayer])
                 {
-                    PrintToChat(iPlayer, CHAT_PREFIX, "Player Reminder Primary Point");
+                    CPrintToChat(iPlayer, CHAT_PREFIX, "Player Reminder Primary Point");
                     g_bCaptureReminderSecondary[iPlayer] = true;
                 }
                 else if (eResourcePoint == eNDPoint_Tertiary && !g_bCaptureReminderTertiary[iPlayer])
                 {
-                    PrintToChat(iPlayer, CHAT_PREFIX, "Player Reminder Primary Point");
+                    CPrintToChat(iPlayer, CHAT_PREFIX, "Player Reminder Primary Point");
                     g_bCaptureReminderTertiary[iPlayer] = true;
                 }
             }
@@ -1100,7 +1100,8 @@ MRESReturn Detour_FireArtilleryAtPosition(DHookParam hParams)
             }
             else
             {
-                PrintToChat(iPlayer, CHAT_PREFIX, "Player Artillery Near Prime");
+                ClientCommand(iPlayer, "play buttons/button7");
+                CPrintToChat(iPlayer, CHAT_PREFIX, "Player Artillery Near Prime");
             }
         }
 
